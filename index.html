@@ -367,19 +367,20 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 .profile-upload-area:hover .profile-edit-overlay{display:flex;}
 
 /* ===== MOBILE NAV ===== */
-#mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(3,7,20,0.98);border-top:1px solid var(--border);z-index:100;backdrop-filter:blur(20px);}
-.mob-items{display:flex;overflow-x:auto;}
-.mob-items::-webkit-scrollbar{display:none;}
-.mob-item{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:8px 10px;cursor:pointer;transition:all 0.2s;min-width:50px;}
-.mob-icon{font-size:17px;}
-.mob-lbl{font-size:8px;color:var(--text2);letter-spacing:0.5px;margin-top:2px;white-space:nowrap;}
-.mob-item.active .mob-icon{filter:drop-shadow(0 0 6px var(--cyan));}
-.mob-item.active .mob-lbl{color:var(--cyan);}
+#mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(3,7,20,0.98);border-top:1px solid var(--border);z-index:100;backdrop-filter:blur(20px);padding-bottom:env(safe-area-inset-bottom);}
+.mob-items{display:grid;grid-template-columns:repeat(8,1fr);width:100%;}
+.mob-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 2px;cursor:pointer;transition:all 0.2s;position:relative;}
+.mob-item:active{transform:scale(0.92);}
+.mob-icon{font-size:clamp(14px,3.5vw,20px);line-height:1;transition:all 0.2s;}
+.mob-lbl{font-size:clamp(7px,1.8vw,10px);color:var(--text2);letter-spacing:0;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center;transition:color 0.2s;}
+.mob-item.active::before{content:'';position:absolute;top:0;left:15%;right:15%;height:2px;background:linear-gradient(to right,var(--cyan),var(--purple));border-radius:0 0 3px 3px;}
+.mob-item.active .mob-icon{filter:drop-shadow(0 0 5px var(--cyan));transform:translateY(-1px);}
+.mob-item.active .mob-lbl{color:var(--cyan);font-weight:700;}
 @media(max-width:768px){
   #sidebar{display:none;}
   #main{margin-left:0!important;}
   #mob-nav{display:block;}
-  #content{padding-bottom:65px;}
+  #content{padding-bottom:70px;}
   .g4,.g3{grid-template-columns:repeat(2,1fr);}
 }
 
@@ -1767,7 +1768,7 @@ function renderChar(){
   [['sk1','sf1',d],['sk2','sf2',f],['sk3','sf3',c],['sk4','sf4',pr]].forEach(([l,f2,v])=>{document.getElementById(l).textContent=v+'%';document.getElementById(f2).style.width=v+'%';});
   ['c-str','c-int','c-agi','c-end','c-wis','c-cha'].forEach((id,i)=>document.getElementById(id).textContent=10+Math.floor(D.char.level*1.5)+i);
 }
-function setAvatar(e){D.char.avatar=e;save();renderChar();updateAvatarUI();}
+function setAvatar(e){D.char.avatar=e;saveImmediate();renderChar();renderProfile();updateAvatarUI();showToast('✅ Avatar updated!');}
 function setClass(c){D.char.cls=c;save();renderChar();}
 function updateCharName(){D.char.name=document.getElementById('c-name-inp').value;D.profile.name=D.char.name;document.getElementById('char-name-disp').textContent=D.char.name;save();}
 
@@ -1792,10 +1793,27 @@ function renderProfile(){
 function triggerProfileUpload(){document.getElementById('profile-img-input').click();}
 function handleProfileImage(e){
   const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();reader.onload=r=>{D.profile.image=r.target.result;save();renderProfile();updateAvatarUI();showToast('📷 Photo updated!');};reader.readAsDataURL(file);
+  const reader=new FileReader();
+  reader.onload=r=>{
+    D.profile.image=r.target.result;
+    saveImmediate().then(()=>showToast('📷 Photo saved!'));
+    renderProfile();updateAvatarUI();
+  };
+  reader.readAsDataURL(file);
 }
 function updateProfileName(){D.profile.name=document.getElementById('profile-name-inp').value;D.char.name=D.profile.name;document.getElementById('profile-name-disp').textContent=D.profile.name;}
-function saveProfile(){D.profile.name=document.getElementById('profile-name-inp').value;D.char.name=D.profile.name;D.profile.status=document.getElementById('profile-status-inp').value;D.profile.dailyGoal=parseInt(document.getElementById('profile-daily-goal').value)||5;document.getElementById('profile-status-disp').textContent=D.profile.status;save();updateAvatarUI();showToast('💾 Profile saved!');}
+function saveProfile(){
+  D.profile.name=document.getElementById('profile-name-inp').value.trim()||D.profile.name;
+  D.char.name=D.profile.name;
+  D.profile.status=document.getElementById('profile-status-inp').value;
+  D.profile.dailyGoal=parseInt(document.getElementById('profile-daily-goal').value)||5;
+  document.getElementById('profile-name-disp').textContent=D.profile.name;
+  document.getElementById('profile-status-disp').textContent=D.profile.status;
+  document.getElementById('sb-username').textContent=D.profile.name;
+  updateAvatarUI();
+  // Use saveImmediate (not debounced save) so profile ALWAYS writes before any page refresh
+  saveImmediate().then(()=>showToast('💾 Profile saved!'));
+}
 function toggleSoundPref(){D.profile.soundOn=D.profile.soundOn===false;document.getElementById('sound-toggle').className=`atoggle ${D.profile.soundOn!==false?'on':'off'}`;save();}
 function confirmReset(){if(confirm('⚠️ Reset all your data? This cannot be undone.')){D=freshData(D.profile?.name||'Hero');saveImmediate().then(()=>location.reload());}}
 
