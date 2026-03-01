@@ -64,6 +64,9 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;}
 body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
+@media(max-width:768px){
+  html,body{height:100%;overflow:hidden;}
+}
 
 /* ===== BG ===== */
 #bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
@@ -99,7 +102,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 #app.hidden{display:none;}
 
 /* ===== SIDEBAR ===== */
-#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(3,7,20,0.98);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;transition:width 0.3s;backdrop-filter:blur(24px);box-shadow:4px 0 40px rgba(0,0,0,0.6);}
+#sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(3,7,20,0.99);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;transition:width 0.3s;box-shadow:4px 0 40px rgba(0,0,0,0.6);}
 #sidebar::before{content:'';position:absolute;top:0;right:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--cyan),var(--purple),transparent);opacity:0.5;}
 .sb-header{padding:16px 12px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .sb-profile-mini{width:36px;height:36px;border-radius:50%;border:2px solid var(--cyan);overflow:hidden;flex-shrink:0;cursor:pointer;box-shadow:var(--glow-cyan);}
@@ -145,7 +148,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 #main.collapsed{margin-left:56px;}
 
 /* ===== TOPBAR ===== */
-#topbar{display:flex;align-items:center;gap:12px;padding:10px 18px;background:rgba(3,7,20,0.9);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);flex-shrink:0;}
+#topbar{display:flex;align-items:center;gap:12px;padding:10px 18px;background:rgba(3,7,20,0.99);border-bottom:1px solid var(--border);flex-shrink:0;}
 .topbar-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--cyan);letter-spacing:2px;}
 .topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
 .xp-wrap{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);padding:4px 10px;border-radius:16px;}
@@ -159,7 +162,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 .topbar-user span{color:var(--cyan);font-weight:700;}
 
 /* ===== CONTENT ===== */
-#content{flex:1;overflow-y:auto;padding:18px;position:relative;}
+#content{flex:1;overflow-y:auto;padding:18px;position:relative;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 #content::-webkit-scrollbar{width:3px;}
 #content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 .page{display:none;}
@@ -167,7 +170,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
 /* ===== CARDS ===== */
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;backdrop-filter:blur(10px);position:relative;overflow:hidden;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--cyan),transparent);opacity:0.3;}
 .card-title{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
@@ -367,7 +370,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 .profile-upload-area:hover .profile-edit-overlay{display:flex;}
 
 /* ===== MOBILE NAV ===== */
-#mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(3,7,20,0.98);border-top:1px solid var(--border);z-index:100;backdrop-filter:blur(20px);padding-bottom:env(safe-area-inset-bottom);}
+#mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(3,7,20,0.99);border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom);}
 .mob-items{display:grid;grid-template-columns:repeat(8,1fr);width:100%;}
 .mob-item{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 6px;cursor:pointer;transition:all 0.2s;position:relative;gap:3px;}
 .mob-item:active{background:rgba(0,212,255,0.05);}
@@ -383,10 +386,11 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 }
 @media(max-width:768px){
   #sidebar{display:none;}
-  #main{margin-left:0!important;}
+  #main{margin-left:0!important;height:100vh;height:100dvh;}
   #mob-nav{display:block;}
-  #content{padding-bottom:70px;}
+  #content{padding:14px 14px 80px 14px;}
   .g4,.g3{grid-template-columns:repeat(2,1fr);}
+  .g2{grid-template-columns:1fr;}
 }
 
 /* ===== FAB ===== */
@@ -1048,7 +1052,8 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 // ===== CANVAS BG =====
 const cv=document.getElementById('bg-canvas'),cx=cv.getContext('2d');
 let pts=[];
-function rz(){cv.width=window.innerWidth;cv.height=window.innerHeight;pts=[];for(let i=0;i<80;i++)pts.push({x:Math.random()*cv.width,y:Math.random()*cv.height,sz:Math.random()*2+0.3,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,op:Math.random()*.5+.1,h:Math.random()<.5?195:270});}
+const isMobile=window.innerWidth<=768||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+function rz(){cv.width=window.innerWidth;cv.height=window.innerHeight;pts=[];const count=isMobile?0:80;for(let i=0;i<count;i++)pts.push({x:Math.random()*cv.width,y:Math.random()*cv.height,sz:Math.random()*2+0.3,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,op:Math.random()*.5+.1,h:Math.random()<.5?195:270});}
 rz();window.addEventListener('resize',rz);
 function drawBg(){
   cx.clearRect(0,0,cv.width,cv.height);
@@ -1060,7 +1065,7 @@ function drawBg(){
   });
   requestAnimationFrame(drawBg);
 }
-drawBg();
+if(!isMobile)drawBg();
 
 // ===== FIREBASE AUTH SYSTEM =====
 function switchAuthTab(t){
@@ -1286,41 +1291,63 @@ let _saveDebounce=null;
 
 async function loadUserData(uid, username){
   currentUID=uid;
-  if(window._useFirebase){
+  const lsKey='isekaiData_'+uid;
+
+  // STEP 1: Load from localStorage instantly (fast, always works)
+  const ls=localStorage.getItem(lsKey);
+  if(ls){
+    try{ D=JSON.parse(ls); }
+    catch(e){ D=freshData(username); seed(); }
+  } else {
+    D=freshData(username);
+    seed();
+  }
+
+  // Ensure all fields exist without overwriting saved data
+  if(!D.profile) D.profile={name:username,status:'',dailyGoal:5,image:null,soundOn:true};
+  if(!D.tasks)   D.tasks={daily:[],weekly:[],monthly:[]};
+  if(!D.habits)  D.habits=[];
+  if(!D.goals)   D.goals=[];
+  if(!D.char)    D.char={name:D.profile.name||username,avatar:'🧙',cls:'Mage',xp:0,level:1};
+  if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
+
+  // STEP 2: Update UI immediately from local data
+  const displayName=D.profile.name||username;
+  document.getElementById('sb-username').textContent=displayName;
+  document.getElementById('topbar-uname').textContent=displayName;
+  document.getElementById('c-name-inp').value=D.char.name||displayName;
+
+  // STEP 3: Background sync from Firestore (doesn't block UI)
+  if(window._useFirebase && typeof firebase!=='undefined'){
     try{
       const snap=await firebase.firestore().doc('users/'+uid).get();
       if(snap.exists){
-        D=snap.data();
-        // Merge missing fields but NEVER overwrite existing saved profile data
-        if(!D.profile) D.profile={name:username,status:'',dailyGoal:5,image:null,soundOn:true};
-        if(!D.tasks)   D.tasks={daily:[],weekly:[],monthly:[]};
-        if(!D.habits)  D.habits=[];
-        if(!D.goals)   D.goals=[];
-        if(!D.char)    D.char={name:D.profile.name||username,avatar:'🧙',cls:'Mage',xp:0,level:1};
-        if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
-      }else{
-        D=freshData(username);
-        seed();
+        const cloudData=snap.data();
+        // Only use cloud data if it's newer or local is empty
+        if(!ls && cloudData){
+          D=cloudData;
+          if(!D.profile) D.profile={name:username,status:'',dailyGoal:5,image:null,soundOn:true};
+          if(!D.tasks)   D.tasks={daily:[],weekly:[],monthly:[]};
+          if(!D.habits)  D.habits=[];
+          if(!D.goals)   D.goals=[];
+          if(!D.char)    D.char={name:D.profile.name||username,avatar:'🧙',cls:'Mage',xp:0,level:1};
+          if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
+          // Save to localStorage for next time
+          localStorage.setItem(lsKey,JSON.stringify(D));
+          // Update UI with cloud data
+          const dn=D.profile.name||username;
+          document.getElementById('sb-username').textContent=dn;
+          document.getElementById('topbar-uname').textContent=dn;
+          document.getElementById('c-name-inp').value=D.char.name||dn;
+        }
+      } else if(!ls){
+        // No data anywhere — save fresh data to cloud
         await saveImmediate();
       }
     }catch(e){
-      console.warn('Firestore error:',e.code,e.message);
-      const ls=localStorage.getItem('isekaiData_'+uid);
-      D=ls?JSON.parse(ls):freshData(username);
-      if(!ls)seed();
-      setTimeout(()=>showToast('⚠️ Cloud sync unavailable — check Firestore Rules'),2500);
+      console.warn('Firestore load failed — using local data. Error:',e.code);
     }
-  } else {
-    // LOCAL MODE — localStorage only
-    const ls=localStorage.getItem('isekaiData_'+uid);
-    D=ls?JSON.parse(ls):freshData(username);
-    if(!ls)seed();
   }
-  // Update UI with saved name (not auth username)
-  const displayName=D.profile?.name||username;
-  document.getElementById('sb-username').textContent=displayName;
-  document.getElementById('topbar-uname').textContent=displayName;
-  document.getElementById('c-name-inp').value=D.char?.name||displayName;
 }
 
 function save(){
@@ -1329,14 +1356,21 @@ function save(){
 }
 
 async function saveImmediate(){
-  if(!currentUID)return;
-  const data=JSON.parse(JSON.stringify(D));
-  // Always write to localStorage (instant, works offline)
-  try{localStorage.setItem('isekaiData_'+currentUID,JSON.stringify(data));}catch(_){}
-  // Also sync to Firestore when in Firebase mode
-  if(window._useFirebase){
-    try{await firebase.firestore().doc('users/'+currentUID).set(data);}
-    catch(e){console.warn('Firestore save failed:',e.code);}
+  if(!currentUID) return;
+  // Deep clone to avoid reference issues
+  let data;
+  try{ data=JSON.parse(JSON.stringify(D)); }
+  catch(e){ console.error('Save serialization failed',e); return; }
+  // 1. Always save to localStorage FIRST — instant, never fails
+  try{ localStorage.setItem('isekaiData_'+currentUID, JSON.stringify(data)); }
+  catch(e){ console.warn('localStorage save failed',e); }
+  // 2. Then try Firestore if in Firebase mode
+  if(window._useFirebase && typeof firebase!=='undefined'){
+    try{
+      await firebase.firestore().doc('users/'+currentUID).set(data);
+    }catch(e){
+      console.warn('Firestore save failed — data safe in localStorage. Error:',e.code);
+    }
   }
 }
 
@@ -1843,16 +1877,31 @@ function handleProfileImage(e){
 }
 function updateProfileName(){D.profile.name=document.getElementById('profile-name-inp').value;D.char.name=D.profile.name;document.getElementById('profile-name-disp').textContent=D.profile.name;}
 function saveProfile(){
-  D.profile.name=document.getElementById('profile-name-inp').value.trim()||D.profile.name;
-  D.char.name=D.profile.name;
-  D.profile.status=document.getElementById('profile-status-inp').value;
-  D.profile.dailyGoal=parseInt(document.getElementById('profile-daily-goal').value)||5;
-  document.getElementById('profile-name-disp').textContent=D.profile.name;
-  document.getElementById('profile-status-disp').textContent=D.profile.status;
-  document.getElementById('sb-username').textContent=D.profile.name;
+  // Read values
+  const nameVal = document.getElementById('profile-name-inp').value.trim();
+  const statusVal = document.getElementById('profile-status-inp').value.trim();
+  const goalVal = parseInt(document.getElementById('profile-daily-goal').value)||5;
+  // Make sure D.profile exists
+  if(!D.profile) D.profile={name:'Hero',status:'',dailyGoal:5,image:null,soundOn:true};
+  // Write to D
+  if(nameVal) D.profile.name = nameVal;
+  D.profile.status = statusVal;
+  D.profile.dailyGoal = goalVal;
+  D.char.name = D.profile.name;
+  // Update all UI displays immediately
+  document.getElementById('profile-name-disp').textContent = D.profile.name;
+  document.getElementById('profile-status-disp').textContent = D.profile.status;
+  document.getElementById('sb-username').textContent = D.profile.name;
+  document.getElementById('topbar-uname').textContent = D.profile.name;
+  document.getElementById('c-name-inp').value = D.profile.name;
   updateAvatarUI();
-  // Use saveImmediate (not debounced save) so profile ALWAYS writes before any page refresh
-  saveImmediate().then(()=>showToast('💾 Profile saved!'));
+  // Save — localStorage is synchronous so it always works even if Firestore fails
+  saveImmediate().then(()=>{
+    showToast('💾 Profile saved!');
+  }).catch(()=>{
+    // Even if async part fails, localStorage already saved it
+    showToast('💾 Saved locally!');
+  });
 }
 function toggleSoundPref(){D.profile.soundOn=D.profile.soundOn===false;document.getElementById('sound-toggle').className=`atoggle ${D.profile.soundOn!==false?'on':'off'}`;save();}
 function confirmReset(){if(confirm('⚠️ Reset all your data? This cannot be undone.')){D=freshData(D.profile?.name||'Hero');saveImmediate().then(()=>location.reload());}}
