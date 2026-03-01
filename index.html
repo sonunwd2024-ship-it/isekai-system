@@ -10,7 +10,6 @@
 <meta name="keywords" content="anime habit tracker, life gamification, productivity app, daily planner, solo leveling tracker, XP system, habit builder, quest tracker, pomodoro timer, goal setting"/>
 <meta name="author" content="ISEKAI SYSTEM"/>
 <meta name="robots" content="index, follow"/>
-<meta name="google-site-verification" content="Cq6PJ2fLzBBtdDX28CHF43Jw_Zt6qSUmnsOyaCAB53Q"/>
 <link rel="canonical" href="https://habbit-tracking-7d28b.web.app/"/>
 
 <!-- Open Graph (Facebook, Discord, WhatsApp previews) -->
@@ -1144,17 +1143,112 @@ window._fbLoadAndLaunch = async function(userObj) {
   document.getElementById('auth-loading').style.display='none';
   document.getElementById('auth-screen').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  // userObj is either a Firebase User or a local {username, uid} object
   const username = userObj.displayName || userObj.username || (userObj.email||'').split('@')[0] || 'Hero';
   const uid = userObj.uid || ('local_'+username);
   document.getElementById('sb-username').textContent = username;
   document.getElementById('topbar-uname').textContent = username;
   await loadUserData(uid, username);
+  runDailyReset();   // ← reset daily tasks + check habit streaks every login
   renderDash();
   initQuoteRotation();
   startAlarmCheck();
   if(Notification.permission==='default')setTimeout(()=>document.getElementById('ndot').style.display='block',2000);
 };
+
+// ===== DAILY RESET & HABIT STREAK LOGIC =====
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+
+function daysBetween(dateStr1, dateStr2){
+  if(!dateStr1||!dateStr2) return 999;
+  const a=new Date(dateStr1), b=new Date(dateStr2);
+  return Math.round(Math.abs((b-a)/(1000*60*60*24)));
+}
+
+// Returns Monday's date string for any given date
+function getMonday(dateStr){
+  const d=new Date(dateStr);
+  const day=d.getDay(); // 0=Sun,1=Mon...
+  const diff=d.getDate()-(day===0?6:day-1);
+  return new Date(d.setDate(diff)).toISOString().split('T')[0];
+}
+
+// Returns "YYYY-MM" for month tracking
+function monthStr(dateStr){ return dateStr.slice(0,7); }
+
+function runDailyReset(){
+  const today = todayStr();
+  const lastOpen = D.stats.lastOpenDate || null;
+
+  // Nothing to do if already ran today
+  if(lastOpen === today){ checkHabitStreaks(today); return; }
+
+  // ── DAILY TASKS: reset checkmarks every new day ────────────────────────
+  D.tasks.daily.forEach(t=>{ t.done=false; });
+
+  // ── WEEKLY TASKS: reset every Monday ──────────────────────────────────
+  const thisMonday = getMonday(today);
+  const lastMonday = lastOpen ? getMonday(lastOpen) : null;
+  if(lastMonday !== thisMonday){
+    D.tasks.weekly.forEach(t=>{ t.done=false; });
+    showToast('📅 New week — weekly missions reset!');
+  }
+
+  // ── MONTHLY TASKS: reset on the 1st of each month ─────────────────────
+  const thisMonth = monthStr(today);
+  const lastMonth = lastOpen ? monthStr(lastOpen) : null;
+  if(lastMonth !== thisMonth){
+    D.tasks.monthly.forEach(t=>{ t.done=false; });
+    showToast('🗓️ New month — monthly objectives reset!');
+  }
+
+  // ── STATS STREAK: track daily task completion streak ──────────────────
+  if(lastOpen){
+    const gap = daysBetween(lastOpen, today);
+    if(gap >= 2){
+      // Missed a day — reset overall streak
+      D.stats.streak = 0;
+    }
+  }
+
+  // ── HISTORY: record activity for heatmap ──────────────────────────────
+  const doneCt = D.tasks.daily.length; // will be 0 after reset, track pre-reset
+  D.stats.history = D.stats.history || [];
+  D.stats.history.push(doneCt);
+  if(D.stats.history.length > 30) D.stats.history.shift();
+
+  D.stats.lastOpenDate = today;
+
+  // ── HABITS: reset done count + check streak breaks ────────────────────
+  checkHabitStreaks(today);
+
+  save();
+}
+
+function checkHabitStreaks(today){
+  let changed = false;
+  D.habits.forEach(h=>{
+    const lastDone = h.lastCompletedDate || null;
+
+    // New day → reset done count so they can log again
+    if(lastDone !== today){
+      h.done = 0;
+      changed = true;
+    }
+
+    // Break streak only after skipping 2+ full days
+    // gap=1 → skipped yesterday → grace period, streak safe
+    // gap=2 → skipped 2 days → streak breaks
+    if(lastDone && h.streak > 0){
+      const gap = daysBetween(lastDone, today);
+      if(gap >= 2){
+        showToast(`💔 ${h.name} streak lost — ${gap} days missed`);
+        h.streak = 0;
+        changed = true;
+      }
+    }
+  });
+  if(changed) save();
+}
 
 // ===== PER-USER DATA (Firestore) =====
 let D={};
@@ -1172,7 +1266,7 @@ async function loadUserData(uid, username){
         D.tasks=D.tasks||{daily:[],weekly:[],monthly:[]};
         D.habits=D.habits||[];D.goals=D.goals||[];
         D.char=D.char||{name:username,avatar:'🧙',cls:'Mage',xp:0,level:1};
-        D.stats=D.stats||{totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[]};
+        D.stats=D.stats||{totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
       }else{D=freshData(username);seed();await saveImmediate();}
     }catch(e){
       console.warn('Firestore error (check Rules):',e.code);
@@ -1211,7 +1305,7 @@ function freshData(username='Hero'){
     habits:[],goals:[],alarms:[],
     char:{name:username,avatar:'🧙',cls:'Mage',xp:0,level:1},
     profile:{name:username,status:'',dailyGoal:5,image:null,soundOn:true},
-    stats:{totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[]}
+    stats:{totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null}
   };
 }
 
@@ -1524,8 +1618,22 @@ function renderTasks(type){
 function toggleTask(type,id){
   const t=D.tasks[type].find(t=>t.id===id);if(!t)return;
   t.done=!t.done;
-  if(t.done){gainXP(t.rank==='S'?100:t.rank==='A'?60:t.rank==='B'?30:10);D.stats.totalDone++;D.stats.streak++;if(D.stats.streak>D.stats.bestStreak)D.stats.bestStreak=D.stats.streak;D.stats.history.push(1);if(D.stats.history.length>30)D.stats.history.shift();playSound('complete');showToast(`✅ Quest done! +XP`);}
-  else{D.stats.totalDone=Math.max(0,D.stats.totalDone-1);}
+  if(t.done){
+    const xp=t.rank==='S'?100:t.rank==='A'?60:t.rank==='B'?30:10;
+    gainXP(xp);
+    D.stats.totalDone++;
+    // Only increment streak for daily tasks (weekly/monthly don't count for daily streak)
+    if(type==='daily'){
+      D.stats.streak++;
+      if(D.stats.streak>D.stats.bestStreak) D.stats.bestStreak=D.stats.streak;
+      D.stats.lastTaskDate=todayStr();
+    }
+    playSound('complete');
+    showToast(`✅ Quest done! +${xp} XP`);
+  } else {
+    D.stats.totalDone=Math.max(0,D.stats.totalDone-1);
+    if(type==='daily') D.stats.streak=Math.max(0,D.stats.streak-1);
+  }
   save();renderPage(curPage);
 }
 function toggleSub(type,tid,idx){const t=D.tasks[type].find(t=>t.id===tid);if(t&&t.sub[idx]){t.sub[idx].d=!t.sub[idx].d;save();renderPage(curPage);}}
@@ -1605,7 +1713,22 @@ function renderHabits(){
   const hm=document.getElementById('habit-heatmap');hm.innerHTML='';
   for(let i=0;i<28;i++){const l=['','l1','l2','l3','l4'][Math.floor(Math.random()*5)];hm.innerHTML+=`<div class="hm-cell ${l}"></div>`;}
 }
-function logHabit(id){const h=D.habits.find(h=>h.id===id);if(!h)return;h.done=(h.done||0)+1;if(h.done>=h.target){h.streak=(h.streak||0)+1;gainXP(20);playSound('complete');showToast(`🔥 ${h.name} — ${h.streak} day streak!`);}save();renderHabits();}
+function logHabit(id){
+  const h=D.habits.find(h=>h.id===id);if(!h)return;
+  const today=todayStr();
+  // Don't count more than target per day
+  if((h.done||0)>=h.target){showToast(`✅ ${h.name} already done today!`);return;}
+  h.done=(h.done||0)+1;
+  if(h.done>=h.target){
+    h.streak=(h.streak||0)+1;
+    h.lastCompletedDate=today;
+    if(h.streak>D.stats.bestStreak)D.stats.bestStreak=h.streak;
+    gainXP(20);
+    playSound('complete');
+    showToast(`🔥 ${h.name} — ${h.streak} day streak!`);
+  }
+  save();renderHabits();
+}
 function delHabit(id){D.habits=D.habits.filter(h=>h.id!==id);save();renderHabits();}
 
 // ===== GOALS =====
