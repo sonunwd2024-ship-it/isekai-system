@@ -226,6 +226,9 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 .task-alarm-icon{font-size:12px;color:var(--orange);cursor:default;}
 .task-del{width:22px;height:22px;border-radius:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.2s;}
 .task-item:hover .task-del{opacity:0.6;}
+.task-edit-btn{background:none;border:none;color:var(--cyan);cursor:pointer;font-size:14px;padding:4px 6px;opacity:0;transition:opacity 0.2s;line-height:1;flex-shrink:0;}
+.task-item:hover .task-edit-btn{opacity:0.7;}
+.task-edit-btn:hover{opacity:1!important;}
 
 /* ===== SUBTASKS ===== */
 .subtask-wrap{padding-left:30px;margin-top:-2px;margin-bottom:6px;}
@@ -286,7 +289,46 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 .hsc{width:11px;height:11px;border-radius:2px;background:rgba(255,255,255,0.05);}
 .hsc.on{background:var(--green);}
 
-/* ===== GOALS ===== */
+/* ===== FUTURISTIC HUD ===== */
+.futuristic-hud{background:linear-gradient(135deg,rgba(0,212,255,0.04),rgba(191,90,242,0.04));border:1px solid rgba(0,212,255,0.15);border-radius:14px;padding:14px;position:relative;overflow:hidden;}
+.futuristic-hud::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--cyan),transparent);}
+.futuristic-hud::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--purple),transparent);}
+.boss-hud{background:linear-gradient(135deg,rgba(255,55,95,0.04),rgba(255,159,10,0.04));border-color:rgba(255,55,95,0.2);}
+.boss-hud::before{background:linear-gradient(to right,transparent,var(--red),transparent);}
+.boss-hud::after{background:linear-gradient(to right,transparent,var(--orange),transparent);}
+.hud-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.hud-stat{text-align:center;background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 4px;border:1px solid rgba(255,255,255,0.04);}
+.hud-val{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--cyan);line-height:1;}
+.hud-lbl{font-size:8px;color:var(--text3);letter-spacing:1px;margin-top:3px;font-weight:700;}
+.hud-bar{height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;}
+.hud-bar-fill{height:100%;border-radius:3px;background:linear-gradient(to right,var(--cyan),var(--purple));transition:width 0.8s ease;}
+
+/* ===== STREAK FLAME ===== */
+.streak-flame{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;}
+.streak-flame.hot{background:rgba(255,159,10,0.15);color:var(--orange);border:1px solid rgba(255,159,10,0.3);}
+.streak-flame.fire{background:rgba(255,55,95,0.15);color:var(--red);border:1px solid rgba(255,55,95,0.3);animation:pulse-flame 2s ease infinite;}
+.streak-flame.cold{background:rgba(255,255,255,0.05);color:var(--text3);border:1px solid rgba(255,255,255,0.08);}
+@keyframes pulse-flame{0%,100%{box-shadow:0 0 0px rgba(255,55,95,0);}50%{box-shadow:0 0 10px rgba(255,55,95,0.4);}}
+
+/* ===== HABIT CHAIN VIEW ===== */
+.habit-chain-item{display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;margin-bottom:6px;position:relative;overflow:hidden;}
+.habit-chain-bar{position:absolute;left:0;top:0;bottom:0;border-radius:10px 0 0 10px;opacity:0.12;transition:width 0.8s ease;}
+.chain-links{display:flex;gap:2px;flex-wrap:wrap;margin-top:4px;}
+.chain-link{width:10px;height:10px;border-radius:2px;background:rgba(255,255,255,0.06);transition:all 0.2s;}
+.chain-link.done{background:var(--green);}
+.chain-link.today-link{border:1px solid var(--cyan);}
+
+/* ===== DAILY STATUS MSG STYLES ===== */
+.status-perfect{color:var(--gold)!important;}
+.status-good{color:var(--green)!important;}
+.status-started{color:var(--cyan)!important;}
+.status-none{color:var(--text2)!important;}
+
+/* ===== WEEK BURNDOWN ===== */
+.burndown-bar{flex:1;border-radius:3px 3px 0 0;transition:height 0.6s ease;min-width:0;position:relative;}
+.burndown-bar.today-bar{box-shadow:0 0 8px rgba(0,212,255,0.5);}
+.burndown-lbl{flex:1;text-align:center;font-size:9px;color:var(--text3);min-width:0;}
+.burndown-lbl.today-lbl{color:var(--cyan);font-weight:700;}
 .goal-item{padding:13px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;margin-bottom:9px;}
 .goal-bar{height:7px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;}
 .goal-fill{height:100%;border-radius:4px;background:linear-gradient(to right,var(--cyan),var(--purple));transition:width 0.6s;}
@@ -749,50 +791,148 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 
       <!-- ===== DAILY ===== -->
       <div class="page" id="page-daily">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-          <div class="sec" style="margin-bottom:0">☀️ Daily Quests</div>
-          <div style="display:flex;gap:7px;align-items:center">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="sec" style="margin-bottom:2px">☀️ Daily Quests</div>
+            <div id="daily-date-sub" style="font-size:11px;color:var(--text2);letter-spacing:1px"></div>
+          </div>
+          <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
             <select class="form-i" id="daily-sort" onchange="renderTasks('daily')" style="width:auto;padding:5px 10px;font-size:11px">
               <option value="all">All Ranks</option>
-              <option value="S">S-Rank</option><option value="A">A-Rank</option><option value="B">B-Rank</option><option value="C">C-Rank</option>
+              <option value="S">⭐ S-Rank</option><option value="A">🔷 A-Rank</option><option value="B">🔹 B-Rank</option><option value="C">· C-Rank</option>
             </select>
-            <button class="btn btn-c" onclick="openAddTask('daily')">+ New Quest</button>
+            <button class="btn btn-c" onclick="openAddTask('daily')">＋ New Quest</button>
           </div>
         </div>
+
+        <!-- Daily XP & Progress HUD -->
+        <div class="futuristic-hud" style="margin-bottom:14px">
+          <div class="hud-row">
+            <div class="hud-stat">
+              <div class="hud-val" id="d-done-count">0</div>
+              <div class="hud-lbl">DONE</div>
+            </div>
+            <div class="hud-stat">
+              <div class="hud-val" id="d-total-count">0</div>
+              <div class="hud-lbl">TOTAL</div>
+            </div>
+            <div class="hud-stat">
+              <div class="hud-val" id="d-xp-earned" style="color:var(--gold)">0</div>
+              <div class="hud-lbl">XP EARNED</div>
+            </div>
+            <div class="hud-stat">
+              <div class="hud-val" id="d-streak-today" style="color:var(--orange)">0</div>
+              <div class="hud-lbl">STREAK</div>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:10px;color:var(--text2);letter-spacing:1px">DAILY PROGRESS</span>
+              <span style="font-size:10px;color:var(--cyan);font-weight:700" id="d-pct-lbl">0%</span>
+            </div>
+            <div class="hud-bar"><div class="hud-bar-fill" id="d-hud-fill" style="width:0%"></div></div>
+          </div>
+          <!-- Motivational status -->
+          <div id="d-status-msg" style="font-size:11px;color:var(--purple);text-align:center;margin-top:8px;font-style:italic;letter-spacing:0.5px"></div>
+        </div>
+
+        <!-- Priority Zones -->
+        <div id="d-priority-zone" style="margin-bottom:10px;display:none">
+          <div style="font-size:10px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:6px">⚡ PRIORITY MISSIONS</div>
+          <div id="d-priority-list"></div>
+          <div style="font-size:10px;color:var(--text3);letter-spacing:2px;font-weight:700;margin:10px 0 6px">— OTHER QUESTS —</div>
+        </div>
+
         <div id="daily-list"></div>
       </div>
 
       <!-- ===== WEEKLY ===== -->
       <div class="page" id="page-weekly">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-          <div class="sec" style="margin-bottom:0">📅 Weekly Missions</div>
-          <div style="display:flex;gap:7px">
-            <button class="btn btn-c" onclick="setWeeklyView('list')">List</button>
-            <button class="btn btn-p" onclick="setWeeklyView('grid')">Week Grid</button>
-            <button class="btn btn-c" onclick="openAddTask('weekly')">+ New</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="sec" style="margin-bottom:2px">📅 Weekly Missions</div>
+            <div id="weekly-sub" style="font-size:11px;color:var(--text2);letter-spacing:1px"></div>
+          </div>
+          <div style="display:flex;gap:7px;flex-wrap:wrap">
+            <button class="btn btn-c" id="wbtn-list" onclick="setWeeklyView('list')">List</button>
+            <button class="btn btn-p" id="wbtn-grid" onclick="setWeeklyView('grid')">Grid</button>
+            <button class="btn btn-c" onclick="openAddTask('weekly')">＋ New</button>
           </div>
         </div>
+
+        <!-- Weekly HUD -->
+        <div class="futuristic-hud" style="margin-bottom:14px">
+          <div class="hud-row">
+            <div class="hud-stat"><div class="hud-val" id="w-done-count">0</div><div class="hud-lbl">DONE</div></div>
+            <div class="hud-stat"><div class="hud-val" id="w-total-count">0</div><div class="hud-lbl">TOTAL</div></div>
+            <div class="hud-stat"><div class="hud-val" id="w-s-count" style="color:var(--gold)">0</div><div class="hud-lbl">S-RANK</div></div>
+            <div class="hud-stat"><div class="hud-val" id="w-days-left" style="color:var(--red)">0</div><div class="hud-lbl">DAYS LEFT</div></div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:10px;color:var(--text2);letter-spacing:1px">WEEK COMPLETION</span>
+              <span style="font-size:10px;color:var(--purple);font-weight:700" id="w-rate">0%</span>
+            </div>
+            <div class="hud-bar" style="--hud-color:var(--purple)"><div class="hud-bar-fill" id="w-fill" style="width:0%;background:linear-gradient(to right,var(--purple),var(--pink))"></div></div>
+          </div>
+          <!-- Day burndown mini chart -->
+          <div style="margin-top:12px">
+            <div style="font-size:10px;color:var(--text2);letter-spacing:1px;margin-bottom:6px">TASK DISTRIBUTION</div>
+            <div id="week-burndown" style="display:flex;gap:4px;align-items:flex-end;height:40px"></div>
+            <div id="week-burndown-labels" style="display:flex;gap:4px;margin-top:3px"></div>
+          </div>
+        </div>
+
         <div id="weekly-view-list"><div id="weekly-list"></div></div>
         <div id="weekly-view-grid" style="display:none">
           <div class="week-grid" id="week-grid"></div>
-        </div>
-        <div class="card" style="margin-top:14px">
-          <div class="card-title">📊 Weekly Progress</div>
-          <div class="crate-bar"><div class="crate-header"><span class="crate-label">Completion</span><span class="crate-val" id="w-rate" style="color:var(--cyan)">0%</span></div><div class="crate-track"><div class="crate-fill" id="w-fill" style="width:0%;background:linear-gradient(to right,var(--cyan),var(--purple))"></div></div></div>
         </div>
       </div>
 
       <!-- ===== MONTHLY ===== -->
       <div class="page" id="page-monthly">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-          <div class="sec" style="margin-bottom:0">🗓️ Monthly Objectives</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="sec" style="margin-bottom:2px">🗓️ Monthly Objectives</div>
+            <div id="monthly-sub" style="font-size:11px;color:var(--text2);letter-spacing:1px"></div>
+          </div>
           <div style="display:flex;gap:7px;flex-wrap:wrap">
             <button class="btn btn-c" onclick="setMonthView('list')">List</button>
             <button class="btn btn-p" onclick="setMonthView('calendar')">Calendar</button>
             <button class="btn btn-g" onclick="setMonthView('weeks')">By Week</button>
-            <button class="btn btn-c" onclick="openAddTask('monthly')">+ New</button>
+            <button class="btn btn-c" onclick="openAddTask('monthly')">＋ New</button>
           </div>
         </div>
+
+        <!-- Monthly Boss Battle HUD -->
+        <div class="futuristic-hud boss-hud" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="font-size:28px" id="m-boss-icon">🐉</div>
+            <div style="flex:1">
+              <div style="font-size:10px;color:var(--red);letter-spacing:2px;font-weight:700">MONTHLY BOSS</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text)" id="m-boss-name">Defeat all missions!</div>
+            </div>
+            <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:var(--gold)" id="m-rate">0%</div>
+          </div>
+          <!-- Boss HP bar -->
+          <div style="margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+              <span style="font-size:9px;color:var(--red);letter-spacing:1px">BOSS HP</span>
+              <span style="font-size:9px;color:var(--text2)" id="m-hp-text">0 / 0 missions</span>
+            </div>
+            <div style="height:10px;background:rgba(255,55,95,0.1);border-radius:5px;overflow:hidden;border:1px solid rgba(255,55,95,0.2)">
+              <div id="m-fill" style="height:100%;border-radius:5px;background:linear-gradient(to right,var(--red),var(--orange));transition:width 0.8s ease;width:0%"></div>
+            </div>
+          </div>
+          <div class="hud-row">
+            <div class="hud-stat"><div class="hud-val" id="m-done-count">0</div><div class="hud-lbl">SLAIN</div></div>
+            <div class="hud-stat"><div class="hud-val" id="m-total-count">0</div><div class="hud-lbl">TOTAL</div></div>
+            <div class="hud-stat"><div class="hud-val" id="m-days-left" style="color:var(--orange)">0</div><div class="hud-lbl">DAYS LEFT</div></div>
+            <div class="hud-stat"><div class="hud-val" id="m-xp-pot" style="color:var(--gold)">0</div><div class="hud-lbl">XP LOOT</div></div>
+          </div>
+        </div>
+
         <div id="monthly-view-list"><div id="monthly-list"></div></div>
         <div id="monthly-view-calendar" style="display:none">
           <div class="card" style="margin-bottom:12px">
@@ -805,26 +945,56 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
           </div>
         </div>
         <div id="monthly-view-weeks" style="display:none"><div id="monthly-weeks-content"></div></div>
-        <div class="card" style="margin-top:14px">
-          <div class="card-title">📊 Monthly Progress</div>
-          <div class="crate-bar"><div class="crate-header"><span class="crate-label">Completion</span><span class="crate-val" id="m-rate" style="color:var(--gold)">0%</span></div><div class="crate-track"><div class="crate-fill" id="m-fill" style="width:0%;background:linear-gradient(to right,var(--gold),var(--orange))"></div></div></div>
-        </div>
       </div>
 
       <!-- ===== HABITS ===== -->
       <div class="page" id="page-habits">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div class="sec" style="margin-bottom:0">🔥 Habit Forge</div>
-          <button class="btn btn-p" onclick="openAddHabit()">+ Forge Habit</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div class="sec" style="margin-bottom:2px">🔥 Habit Forge</div>
+            <div style="font-size:11px;color:var(--text2);letter-spacing:1px" id="habit-sub"></div>
+          </div>
+          <button class="btn btn-p" onclick="openAddHabit()">＋ Forge Habit</button>
         </div>
-        <div class="g3" style="margin-bottom:14px">
-          <div class="stat-card gr"><div class="si">🔥</div><div class="sv" id="h-active">0</div><div class="sl">Active</div></div>
-          <div class="stat-card g"><div class="si">⚡</div><div class="sv" id="h-best">0</div><div class="sl">Best Streak</div></div>
-          <div class="stat-card c"><div class="si">✅</div><div class="sv" id="h-today">0</div><div class="sl">Done Today</div></div>
+
+        <!-- Habit Power HUD -->
+        <div class="futuristic-hud" style="margin-bottom:14px">
+          <div class="hud-row" style="margin-bottom:10px">
+            <div class="hud-stat"><div class="hud-val" id="h-active">0</div><div class="hud-lbl">ACTIVE</div></div>
+            <div class="hud-stat"><div class="hud-val" id="h-best" style="color:var(--gold)">0</div><div class="hud-lbl">BEST STREAK</div></div>
+            <div class="hud-stat"><div class="hud-val" id="h-today" style="color:var(--green)">0</div><div class="hud-lbl">DONE TODAY</div></div>
+            <div class="hud-stat"><div class="hud-val" id="h-power" style="color:var(--purple)">0</div><div class="hud-lbl">POWER LV</div></div>
+          </div>
+          <!-- Habit completion ring -->
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="position:relative;width:64px;height:64px;flex-shrink:0">
+              <svg viewBox="0 0 64 64" style="width:64px;height:64px;transform:rotate(-90deg)">
+                <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+                <circle cx="32" cy="32" r="26" fill="none" stroke="url(#habitRingGrad)" stroke-width="6"
+                  stroke-dasharray="163.4" id="habit-ring-dash" stroke-dashoffset="163.4"
+                  stroke-linecap="round" style="transition:stroke-dashoffset 0.8s ease"/>
+              </svg>
+              <defs><linearGradient id="habitRingGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#bf5af2"/></linearGradient></defs>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--cyan)" id="habit-ring-pct">0%</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:11px;color:var(--text2);margin-bottom:4px">TODAY'S HABIT POWER</div>
+              <div class="hud-bar"><div class="hud-bar-fill" id="habit-power-bar" style="width:0%;background:linear-gradient(to right,var(--orange),var(--gold))"></div></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px" id="habit-encouragement"></div>
+            </div>
+          </div>
         </div>
+
+        <!-- Chain view toggle -->
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button class="btn btn-c" id="hview-cards" onclick="setHabitView('cards')" style="font-size:11px">Cards</button>
+          <button class="btn btn-p" id="hview-chain" onclick="setHabitView('chain')" style="font-size:11px">🔗 Chain</button>
+        </div>
+
         <div id="habits-list"></div>
+
         <div class="card" style="margin-top:14px">
-          <div class="card-title">📆 28-Day Activity</div>
+          <div class="card-title">📆 28-Day Activity Heatmap</div>
           <div class="heatmap" id="habit-heatmap"></div>
         </div>
       </div>
@@ -1673,11 +1843,12 @@ function taskHTML(t,type,showSub=false){
     <div class="task-check">${t.done?'✓':''}</div>
     <div class="task-title">${t.title}</div>
     <div class="task-meta">
-      ${t.time?`<span class="task-time">⏰${t.time}</span>`:''}
+      ${t.time?`<span class="task-time">⏰${to12h(t.time)}</span>`:''}
       ${t.deadline&&!t.time?`<span class="task-time">📅${t.deadline}</span>`:''}
-      ${t.alarm?`<span class="task-alarm-icon" title="Alarm set: ${t.alarm}">🔔</span>`:''}
+      ${t.alarm?`<span class="task-alarm-icon" title="Alarm: ${to12h(t.alarm)}">🔔${to12h(t.alarm)}</span>`:''}
       <span class="rank-badge r${t.rank}">${t.rank}</span>
     </div>
+    <button class="task-edit-btn" onclick="event.stopPropagation();editTask('${type}',${t.id})" title="Edit">✎</button>
     <button class="task-del" onclick="event.stopPropagation();delTask('${type}',${t.id})">✕</button>
   </div>${sub}`;
 }
@@ -1687,45 +1858,177 @@ function renderTasks(type){
   let tasks=D.tasks[type].slice();
   if(sort!=='all')tasks=tasks.filter(t=>t.rank===sort);
   const c=document.getElementById(type+'-list');
-  if(c)c.innerHTML=tasks.map(t=>taskHTML(t,type,true)).join('')||'<div class="empty-state"><div class="ei">✨</div><div class="et">No tasks yet!</div></div>';
+
+  if(type==='daily'){
+    // Update date subtitle
+    const sub=document.getElementById('daily-date-sub');
+    if(sub){const now=new Date();sub.textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();}
+
+    // Priority zone - S and A rank undone tasks
+    const priority=D.tasks.daily.filter(t=>!t.done&&(t.rank==='S'||t.rank==='A'));
+    const pZone=document.getElementById('d-priority-zone');
+    const pList=document.getElementById('d-priority-list');
+    if(pZone&&pList){
+      if(priority.length>0&&sort==='all'){
+        pZone.style.display='block';
+        pList.innerHTML=priority.map(t=>taskHTML(t,'daily',true)).join('');
+        // Show remaining non-priority tasks below
+        const rest=tasks.filter(t=>!priority.find(p=>p.id===t.id)||t.done);
+        if(c)c.innerHTML=rest.map(t=>taskHTML(t,'daily',true)).join('')||'';
+      }else{
+        pZone.style.display='none';
+        if(c)c.innerHTML=tasks.map(t=>taskHTML(t,'daily',true)).join('')||'<div class="empty-state"><div class="ei">✨</div><div class="et">No tasks yet!</div></div>';
+      }
+    }
+
+    // Update HUD stats
+    const allDaily=D.tasks.daily;
+    const done=allDaily.filter(t=>t.done).length;
+    const total=allDaily.length;
+    const pct=total>0?Math.round(done/total*100):0;
+    const xpEarned=allDaily.filter(t=>t.done).reduce((s,t)=>s+(t.xpAwarded||(t.rank==='S'?100:t.rank==='A'?60:t.rank==='B'?30:10)),0);
+
+    const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    el('d-done-count',done);el('d-total-count',total);
+    el('d-xp-earned',xpEarned);el('d-streak-today',D.stats.streak||0);
+    el('d-pct-lbl',pct+'%');
+    const fill=document.getElementById('d-hud-fill');if(fill)fill.style.width=pct+'%';
+
+    // Motivational message
+    const msg=document.getElementById('d-status-msg');
+    if(msg){
+      if(total===0)  {msg.textContent='Add your first quest for today, hero.';msg.className='status-none';}
+      else if(pct===100){msg.textContent='⚡ ALL QUESTS COMPLETE — MAXIMUM POWER!';msg.className='status-perfect';}
+      else if(pct>=75){msg.textContent='🔥 Almost there! Keep pushing, hero.';msg.className='status-good';}
+      else if(pct>=50){msg.textContent='💪 Halfway done. You\'re on fire!';msg.className='status-started';}
+      else if(pct>0) {msg.textContent='⚔️ Quest in progress. Never stop.';msg.className='status-started';}
+      else           {msg.textContent='🌅 A new day, new power. Begin!';msg.className='status-none';}
+    }
+  } else {
+    if(c)c.innerHTML=tasks.map(t=>taskHTML(t,type,true)).join('')||'<div class="empty-state"><div class="ei">✨</div><div class="et">No tasks yet!</div></div>';
+  }
 }
 
 function toggleTask(type,id){
   const t=D.tasks[type].find(t=>t.id===id);if(!t)return;
   t.done=!t.done;
+  const xp=t.rank==='S'?100:t.rank==='A'?60:t.rank==='B'?30:10;
   if(t.done){
-    const xp=t.rank==='S'?100:t.rank==='A'?60:t.rank==='B'?30:10;
+    t.xpAwarded=xp; // track exactly what we gave
     gainXP(xp);
     D.stats.totalDone++;
-    // Only increment streak for daily tasks (weekly/monthly don't count for daily streak)
     if(type==='daily'){
       D.stats.streak++;
-      if(D.stats.streak>D.stats.bestStreak) D.stats.bestStreak=D.stats.streak;
+      if(D.stats.streak>D.stats.bestStreak)D.stats.bestStreak=D.stats.streak;
       D.stats.lastTaskDate=todayStr();
     }
     playSound('complete');
     showToast(`✅ Quest done! +${xp} XP`);
   } else {
+    // Remove exactly the XP that was awarded (not recalculated)
+    const awarded=t.xpAwarded||xp;
+    D.char.xp=Math.max(0,D.char.xp-awarded);
+    t.xpAwarded=0;
     D.stats.totalDone=Math.max(0,D.stats.totalDone-1);
-    if(type==='daily') D.stats.streak=Math.max(0,D.stats.streak-1);
+    if(type==='daily')D.stats.streak=Math.max(0,D.stats.streak-1);
+    updateXPBar();
   }
   save();renderPage(curPage);
 }
 function toggleSub(type,tid,idx){const t=D.tasks[type].find(t=>t.id===tid);if(t&&t.sub[idx]){t.sub[idx].d=!t.sub[idx].d;save();renderPage(curPage);}}
 function delTask(type,id){D.tasks[type]=D.tasks[type].filter(t=>t.id!==id);save();renderPage(curPage);}
+
+function editTask(type,id){
+  const t=D.tasks[type].find(t=>t.id===id);if(!t)return;
+  document.getElementById('modal-t').textContent='EDIT '+type.toUpperCase()+' QUEST';
+  document.getElementById('modal-b').innerHTML=`
+    <div class="form-g"><label class="form-l">Title</label><input class="form-i" id="et-title" value="${t.title.replace(/"/g,'&quot;')}"/></div>
+    <div class="form-row">
+      <div class="form-g"><label class="form-l">Rank</label><select class="form-i" id="et-rank">
+        ${['S','A','B','C'].map(r=>`<option ${t.rank===r?'selected':''}>${r}</option>`).join('')}
+      </select></div>
+      <div class="form-g"><label class="form-l">Category</label><select class="form-i" id="et-cat">
+        ${['Health','Work','Learning','Personal','Finance'].map(c=>`<option ${t.cat===c?'selected':''}>${c}</option>`).join('')}
+      </select></div>
+    </div>
+    ${type==='daily'?`<div class="form-g"><label class="form-l">Time</label><input class="form-i" id="et-time" type="time" value="${t.time||''}"/></div>`:''}
+    ${type==='weekly'?`<div class="form-g"><label class="form-l">Day</label><select class="form-i" id="et-day">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<option ${t.day===d?'selected':''}>${d}</option>`).join('')}</select></div>`:''}
+    ${type!=='daily'?`<div class="form-g"><label class="form-l">Deadline</label><input class="form-i" id="et-deadline" type="date" value="${t.deadline||''}"/></div>`:''}
+    <div class="form-g"><label class="form-l">Subtasks (one per line)</label><textarea class="form-i" id="et-sub" rows="2" style="resize:vertical">${(t.sub||[]).map(s=>s.t).join('\n')}</textarea></div>
+    <div class="alarm-section">
+      <div class="alarm-section-title">🔔 Alarm</div>
+      <div class="form-g" style="margin-bottom:0"><label class="form-l">Alarm Time</label><input class="form-i" id="et-alarm" type="time" value="${t.alarm||''}"/></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-c" style="flex:1" onclick="saveEditTask('${type}',${id})">💾 Save</button>
+      <button class="btn btn-r" onclick="closeModal()">Cancel</button>
+    </div>`;
+  openModal();
+}
+
+function saveEditTask(type,id){
+  const t=D.tasks[type].find(t=>t.id===id);if(!t)return;
+  t.title=document.getElementById('et-title').value.trim()||t.title;
+  t.rank=document.getElementById('et-rank').value;
+  t.cat=document.getElementById('et-cat').value;
+  if(type==='daily'&&document.getElementById('et-time'))t.time=document.getElementById('et-time').value;
+  if(type==='weekly'&&document.getElementById('et-day'))t.day=document.getElementById('et-day').value;
+  if(document.getElementById('et-deadline'))t.deadline=document.getElementById('et-deadline').value;
+  const subRaw=(document.getElementById('et-sub').value||'').split('\n').map(s=>s.trim()).filter(s=>s);
+  t.sub=subRaw.map((s,i)=>({t:s,d:(t.sub[i]?.t===s&&t.sub[i]?.d)||false}));
+  const newAlarm=document.getElementById('et-alarm').value||null;
+  if(newAlarm&&newAlarm!==t.alarm)schedRem(newAlarm,'Task: '+t.title);
+  t.alarm=newAlarm;
+  save();closeModal();renderPage(curPage);showToast('✅ Quest updated!');
+}
 function gainXP(amt){D.char.xp+=amt;if(D.char.xp>=D.char.level*1000){D.char.level++;showToast(`🎉 LEVEL UP! Level ${D.char.level}!`);}save();updateXPBar();}
 
 // ===== WEEKLY =====
 let wvm='list';
-function setWeeklyView(v){wvm=v;document.getElementById('weekly-view-list').style.display=v==='list'?'block':'none';document.getElementById('weekly-view-grid').style.display=v==='grid'?'block':'none';renderWeekly();}
+function setWeeklyView(v){
+  wvm=v;
+  document.getElementById('weekly-view-list').style.display=v==='list'?'block':'none';
+  document.getElementById('weekly-view-grid').style.display=v==='grid'?'block':'none';
+  ['list','grid'].forEach(m=>{const b=document.getElementById('wbtn-'+m);if(b)b.style.opacity=m===v?'1':'0.5';});
+  renderWeekly();
+}
 function renderWeekly(){
   renderTasks('weekly');
-  const wd=D.tasks.weekly.filter(t=>t.done).length,wt=D.tasks.weekly.length;
-  const p=wt>0?Math.round(wd/wt*100):0;
-  document.getElementById('w-rate').textContent=p+'%';document.getElementById('w-fill').style.width=p+'%';
+  const wt=D.tasks.weekly;
+  const done=wt.filter(t=>t.done).length;
+  const total=wt.length;
+  const p=total>0?Math.round(done/total*100):0;
+  const now=new Date();
+  const dayOfWeek=now.getDay(); // 0=Sun
+  const daysLeft=7-dayOfWeek;
+  const sCount=wt.filter(t=>t.rank==='S').length;
+
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('w-rate',p+'%');el('w-done-count',done);el('w-total-count',total);
+  el('w-s-count',sCount);el('w-days-left',daysLeft);
+  const fill=document.getElementById('w-fill');if(fill)fill.style.width=p+'%';
+
+  // Subtitle
+  const sub=document.getElementById('weekly-sub');
+  if(sub){const d=new Date();const mon=new Date(d);mon.setDate(d.getDate()-d.getDay()+1);const sun=new Date(mon);sun.setDate(mon.getDate()+6);sub.textContent=`${mon.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${sun.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;}
+
+  // Burndown chart — tasks per day of week
+  const dayNames=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const counts=dn.map(d=>wt.filter(t=>t.day===d).length);
+  const mx=Math.max(...counts,1);
+  const bd=document.getElementById('week-burndown');
+  const bdl=document.getElementById('week-burndown-labels');
+  if(bd){
+    bd.innerHTML=counts.map((c,i)=>`<div class="burndown-bar ${i===dayOfWeek?'today-bar':''}" style="height:${Math.max(8,(c/mx)*100)}%;background:${i===dayOfWeek?'var(--cyan)':i<dayOfWeek?'rgba(0,212,255,0.25)':'rgba(255,255,255,0.08)'}" title="${dayNames[i]}: ${c} tasks"></div>`).join('');
+  }
+  if(bdl){
+    bdl.innerHTML=dayNames.map((d,i)=>`<div class="burndown-lbl ${i===dayOfWeek?'today-lbl':''}">${d.slice(0,1)}</div>`).join('');
+  }
+
   if(wvm==='grid'){
-    const days=['SUN','MON','TUE','WED','THU','FRI','SAT'];const dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];const now=new Date();const cd=now.getDay();
-    document.getElementById('week-grid').innerHTML=days.map((d,i)=>`<div class="week-day ${i===cd?'today':''}"><div class="wdh">${d}</div><div class="wdb">${D.tasks.weekly.filter(t=>t.day===dn[i]).map(t=>`<div class="week-chip ${t.done?'done':''} r${t.rank}" onclick="toggleTask('weekly',${t.id})">${t.title}</div>`).join('')}</div></div>`).join('');
+    const cd=now.getDay();
+    document.getElementById('week-grid').innerHTML=dayNames.map((d,i)=>`<div class="week-day ${i===cd?'today':''}"><div class="wdh">${d}</div><div class="wdb">${D.tasks.weekly.filter(t=>t.day===dn[i]).map(t=>`<div class="week-chip ${t.done?'done':''} r${t.rank}" onclick="toggleTask('weekly',${t.id})">${t.title}</div>`).join('')}</div></div>`).join('');
   }
 }
 
@@ -1733,58 +2036,157 @@ function renderWeekly(){
 let mvm='list';
 function setMonthView(v){mvm=v;['list','calendar','weeks'].forEach(m=>document.getElementById('monthly-view-'+m).style.display=m===v?'block':'none');renderMonthly();}
 function renderMonthly(){
-  document.getElementById('monthly-list').innerHTML=D.tasks.monthly.map(t=>taskHTML(t,'monthly',true)).join('')||'<div class="empty-state"><div class="ei">🗓️</div><div class="et">No monthly tasks!</div></div>';
-  const md=D.tasks.monthly.filter(t=>t.done).length,mt=D.tasks.monthly.length;
-  const p=mt>0?Math.round(md/mt*100):0;
-  document.getElementById('m-rate').textContent=p+'%';document.getElementById('m-fill').style.width=p+'%';
+  renderTasks('monthly');
+  const mt=D.tasks.monthly;
+  const done=mt.filter(t=>t.done).length;
+  const total=mt.length;
+  const p=total>0?Math.round(done/total*100):0;
+
+  // Boss HP = inverse — boss is at full HP when 0% done
+  const bossHP=100-p;
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('m-rate',p+'%');el('m-done-count',done);el('m-total-count',total);
+  const fill=document.getElementById('m-fill');if(fill)fill.style.width=bossHP+'%';
+
+  // Days left in month
+  const now=new Date();
+  const daysLeft=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate();
+  el('m-days-left',daysLeft);
+
+  // XP loot potential
+  const xpPot=mt.filter(t=>!t.done).reduce((s,t)=>s+(t.rank==='S'?100:t.rank==='A'?60:t.rank==='B'?30:10),0);
+  el('m-xp-pot',xpPot);
+  el('m-hp-text',`${done} / ${total} missions`);
+
+  // Boss name / icon based on completion
+  const bossNames=[
+    {icon:'🐉',name:'Ancient Dragon awaits your strength!'},
+    {icon:'👹',name:'Demon King HP is dropping!'},
+    {icon:'💀',name:'Lich King is almost defeated!'},
+    {icon:'⚡',name:'Final boss is on his knees!'},
+  ];
+  const bi=Math.min(3,Math.floor(p/25));
+  el('m-boss-name',bossNames[bi].name);
+  const bIcon=document.getElementById('m-boss-icon');if(bIcon)bIcon.textContent=bossNames[bi].icon;
+
+  // Subtitle
+  const sub=document.getElementById('monthly-sub');
+  if(sub)sub.textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
+
   if(mvm==='calendar'){
-    const now=new Date();
-    document.getElementById('cal-month-title').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
-    const first=new Date(now.getFullYear(),now.getMonth(),1);const last=new Date(now.getFullYear(),now.getMonth()+1,0);
+    const mn=now.toLocaleString('default',{month:'long',year:'numeric'});
+    document.getElementById('cal-month-title').textContent=mn;
+    const first=new Date(now.getFullYear(),now.getMonth(),1);
+    const last=new Date(now.getFullYear(),now.getMonth()+1,0);
+    const today=now.getDate();
     let html='';
     for(let i=0;i<first.getDay();i++)html+=`<div class="cal-day other-month"></div>`;
     for(let d=1;d<=last.getDate();d++){
-      const isT=d===now.getDate();
-      html+=`<div class="cal-day ${isT?'today':''}"><div class="cal-day-num">${d}</div>${D.tasks.monthly.filter(t=>t.deadline&&new Date(t.deadline).getDate()===d).map(t=>`<div class="cdot" style="background:${t.rank==='S'?'var(--gold)':t.rank==='A'?'var(--purple)':'var(--cyan)'}" title="${t.title}"></div>`).join('')}</div>`;
+      const isT=d===today;
+      html+=`<div class="cal-day ${isT?'today':''}"><div class="cal-day-num">${d}</div>${D.tasks.monthly.filter(t=>t.deadline&&new Date(t.deadline).getDate()===d).map(t=>`<div class="cdot" style="background:${t.rank==='S'?'var(--gold)':t.rank==='A'?'var(--purple)':'var(--cyan)'};" title="${t.title}"></div>`).join('')}</div>`;
     }
     document.getElementById('month-cal-grid').innerHTML=html;
   }
   if(mvm==='weeks'){
-    const wr=[[1,7],[8,14],[15,21],[22,31]];
-    document.getElementById('monthly-weeks-content').innerHTML=wr.map((r,wi)=>{
-      const wt=D.tasks.monthly.filter(t=>{if(!t.deadline)return wi===0;const day=new Date(t.deadline).getDate();return day>=r[0]&&day<=r[1];});
-      return`<div class="monthly-week-section"><div class="mwh">📅 Week ${wi+1} (Days ${r[0]}–${r[1]===31?'End':r[1]})</div>${wt.length?wt.map(t=>taskHTML(t,'monthly',true)).join(''):'<div style="color:var(--text2);font-size:12px;padding:6px 0">No tasks this week</div>'}</div>`;
+    const weeks=[[1,7],[8,14],[15,21],[22,28],[29,31]];
+    document.getElementById('monthly-weeks-content').innerHTML=weeks.map((r,wi)=>{
+      const wt2=D.tasks.monthly.filter(t=>{if(!t.deadline)return wi===0;const day=new Date(t.deadline).getDate();return day>=r[0]&&day<=r[1];});
+      return`<div class="monthly-week-section"><div class="mwh">📅 Week ${wi+1} (Days ${r[0]}–${r[1]===31?'End':r[1]})</div>${wt2.length?wt2.map(t=>taskHTML(t,'monthly',true)).join(''):'<div style="color:var(--text2);font-size:12px;padding:6px 0">No tasks this week</div>'}</div>`;
     }).join('');
   }
 }
 
-// ===== HABITS =====
+let habitView='cards';
+function setHabitView(v){
+  habitView=v;
+  ['cards','chain'].forEach(m=>{const b=document.getElementById('hview-'+m);if(b)b.style.opacity=m===v?'1':'0.5';});
+  renderHabits();
+}
+
 function renderHabits(){
-  document.getElementById('h-active').textContent=D.habits.length;
-  document.getElementById('h-best').textContent=D.habits.length?Math.max(...D.habits.map(h=>h.streak||0)):0;
-  document.getElementById('h-today').textContent=D.habits.filter(h=>(h.done||0)>=h.target).length;
-  document.getElementById('habits-list').innerHTML=D.habits.map(h=>{
-    const pct=Math.min(100,Math.round(((h.done||0)/h.target)*100));
-    const isDone=(h.done||0)>=h.target;
-    const miniCal=Array.from({length:21},(_,i)=>`<div class="hsc ${i<(h.streak||0)?'on':''}"></div>`).join('');
-    return`<div class="habit-item">
-      <div style="font-size:24px">${h.emoji}</div>
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-          <span style="font-size:13px;font-weight:700">${h.name}</span>
-          ${isDone?`<span style="background:rgba(48,209,88,0.15);color:var(--green);font-size:9px;padding:2px 6px;border-radius:8px">DONE ✓</span>`:''}
-          ${h.alarm?`<span style="font-size:11px;color:var(--orange)" title="Alarm: ${h.alarm}">🔔${h.alarm}</span>`:''}
+  const total=D.habits.length;
+  const doneToday=D.habits.filter(h=>(h.done||0)>=h.target).length;
+  const bestStreak=total?Math.max(...D.habits.map(h=>h.streak||0)):0;
+  const powerLv=Math.floor(D.habits.reduce((s,h)=>s+(h.streak||0),0)/Math.max(total,1));
+
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('h-active',total);el('h-best',bestStreak);el('h-today',doneToday);el('h-power',powerLv);
+
+  // Subtitle
+  const sub=document.getElementById('habit-sub');
+  if(sub)sub.textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}).toUpperCase();
+
+  // Power ring
+  const pct=total>0?Math.round(doneToday/total*100):0;
+  const ring=document.getElementById('habit-ring-dash');
+  if(ring){const circ=163.4;ring.style.strokeDashoffset=circ-(circ*pct/100);}
+  const ringPct=document.getElementById('habit-ring-pct');if(ringPct)ringPct.textContent=pct+'%';
+  const powerBar=document.getElementById('habit-power-bar');if(powerBar)powerBar.style.width=pct+'%';
+  const enc=document.getElementById('habit-encouragement');
+  if(enc){
+    if(pct===100)enc.textContent='⚡ PERFECT DAY — All habits complete!';
+    else if(pct>=75)enc.textContent='🔥 Almost there — one more push!';
+    else if(pct>0)enc.textContent='💪 Good start. Keep the chain alive.';
+    else enc.textContent='🌅 A fresh day. Build your power.';
+  }
+
+  // Render habits
+  if(habitView==='chain'){
+    document.getElementById('habits-list').innerHTML=D.habits.map(h=>{
+      const isDone=(h.done||0)>=h.target;
+      const streak=h.streak||0;
+      const flameClass=streak>=30?'fire':streak>=7?'hot':'cold';
+      const flameIcon=streak>=30?'🔥🔥🔥':streak>=7?'🔥':streak>0?'❄':'·';
+      // Chain links = last 14 days approximation via streak
+      const chainLinks=Array.from({length:14},(_,i)=>`<div class="chain-link ${i<Math.min(streak,14)?'done':''} ${i===13?'today-link':''}"></div>`).join('');
+      return`<div class="habit-chain-item">
+        <div class="habit-chain-bar" style="width:${isDone?100:Math.round(((h.done||0)/h.target)*100)}%;background:${h.color}"></div>
+        <div style="font-size:22px;position:relative">${h.emoji}${isDone?'<span style="position:absolute;top:-4px;right:-4px;font-size:10px">✅</span>':''}</div>
+        <div style="flex:1;min-width:0;position:relative">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            <span style="font-size:13px;font-weight:700">${h.name}</span>
+            <span class="streak-flame ${flameClass}">${flameIcon} ${streak}d</span>
+          </div>
+          <div class="chain-links">${chainLinks}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">${h.done||0}/${h.target} today</div>
         </div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:3px">${h.done||0}/${h.target} · 🔥 ${h.streak||0} day streak</div>
-        <div class="habit-prog"><div class="habit-prog-fill" style="width:${pct}%;background:${h.color}"></div></div>
-        <div class="hsc-wrap">${miniCal}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        <button class="hbtn" onclick="logHabit(${h.id})">+</button>
-        <button onclick="delHabit(${h.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:4px">✕</button>
-      </div>
-    </div>`;
-  }).join('')||'<div class="empty-state"><div class="ei">🔥</div><div class="et">Forge your first habit!</div></div>';
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <button class="hbtn" onclick="logHabit(${h.id})">+</button>
+          <button onclick="editHabit(${h.id})" style="background:none;border:1px solid rgba(0,212,255,0.3);color:var(--cyan);cursor:pointer;font-size:11px;padding:4px 6px;border-radius:5px">✎</button>
+          <button onclick="delHabit(${h.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:4px">✕</button>
+        </div>
+      </div>`;
+    }).join('')||'<div class="empty-state"><div class="ei">🔗</div><div class="et">No chains yet — forge a habit!</div></div>';
+  } else {
+    document.getElementById('habits-list').innerHTML=D.habits.map(h=>{
+      const pctH=Math.min(100,Math.round(((h.done||0)/h.target)*100));
+      const isDone=(h.done||0)>=h.target;
+      const streak=h.streak||0;
+      const flameClass=streak>=30?'fire':streak>=7?'hot':'cold';
+      const flameIcon=streak>=30?'🔥':streak>=7?'🔥':'❄';
+      const miniCal=Array.from({length:21},(_,i)=>`<div class="hsc ${i<streak?'on':''}"></div>`).join('');
+      return`<div class="habit-item">
+        <div style="font-size:24px">${h.emoji}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+            <span style="font-size:13px;font-weight:700">${h.name}</span>
+            ${isDone?`<span style="background:rgba(48,209,88,0.15);color:var(--green);font-size:9px;padding:2px 6px;border-radius:8px">DONE ✓</span>`:''}
+            <span class="streak-flame ${flameClass}">${flameIcon} ${streak}d</span>
+            ${h.alarm?`<span style="font-size:10px;color:var(--orange)">🔔${to12h(h.alarm)}</span>`:''}
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${h.done||0}/${h.target} done today</div>
+          <div class="habit-prog"><div class="habit-prog-fill" style="width:${pctH}%;background:${h.color}"></div></div>
+          <div class="hsc-wrap">${miniCal}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <button class="hbtn" onclick="logHabit(${h.id})">+</button>
+          <button onclick="editHabit(${h.id})" style="background:none;border:1px solid rgba(0,212,255,0.3);color:var(--cyan);cursor:pointer;font-size:11px;padding:4px 6px;border-radius:5px">✎</button>
+          <button onclick="delHabit(${h.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:4px">✕</button>
+        </div>
+      </div>`;
+    }).join('')||'<div class="empty-state"><div class="ei">🔥</div><div class="et">Forge your first habit!</div></div>';
+  }
+
   const hm=document.getElementById('habit-heatmap');hm.innerHTML='';
   for(let i=0;i<28;i++){const l=['','l1','l2','l3','l4'][Math.floor(Math.random()*5)];hm.innerHTML+=`<div class="hm-cell ${l}"></div>`;}
 }
@@ -1806,14 +2208,48 @@ function logHabit(id){
 }
 function delHabit(id){D.habits=D.habits.filter(h=>h.id!==id);save();renderHabits();}
 
+function editHabit(id){
+  const h=D.habits.find(h=>h.id===id);if(!h)return;
+  document.getElementById('modal-t').textContent='EDIT HABIT';
+  document.getElementById('modal-b').innerHTML=`
+    <div class="form-g"><label class="form-l">Habit Name</label><input class="form-i" id="eh-name" value="${h.name.replace(/"/g,'&quot;')}"/></div>
+    <div class="form-row">
+      <div class="form-g"><label class="form-l">Emoji</label><input class="form-i" id="eh-emoji" value="${h.emoji}" maxlength="2"/></div>
+      <div class="form-g"><label class="form-l">Daily Target</label><input class="form-i" id="eh-target" type="number" value="${h.target}" min="1"/></div>
+    </div>
+    <div class="form-g"><label class="form-l">Color</label><input class="form-i" id="eh-color" type="color" value="${h.color||'#00d4ff'}"/></div>
+    <div class="alarm-section">
+      <div class="alarm-section-title">🔔 Alarm</div>
+      <div class="form-g" style="margin-bottom:0"><label class="form-l">Alarm Time</label><input class="form-i" id="eh-alarm" type="time" value="${h.alarm||''}"/></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-p" style="flex:1" onclick="saveEditHabit(${id})">💾 Save</button>
+      <button class="btn btn-r" onclick="closeModal()">Cancel</button>
+    </div>`;
+  openModal();
+}
+
+function saveEditHabit(id){
+  const h=D.habits.find(h=>h.id===id);if(!h)return;
+  h.name=document.getElementById('eh-name').value.trim()||h.name;
+  h.emoji=document.getElementById('eh-emoji').value||h.emoji;
+  h.target=parseInt(document.getElementById('eh-target').value)||1;
+  h.color=document.getElementById('eh-color').value;
+  const newAlarm=document.getElementById('eh-alarm').value||null;
+  if(newAlarm&&newAlarm!==h.alarm)schedRem(newAlarm,'Habit: '+h.name);
+  h.alarm=newAlarm;
+  save();closeModal();renderHabits();showToast('✅ Habit updated!');
+}
+
 // ===== GOALS =====
 function renderGoals(){
   document.getElementById('goals-list').innerHTML=D.goals.map(g=>`
     <div class="goal-item">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
         <div style="font-size:26px">${g.icon}</div>
-        <div style="flex:1"><div style="font-size:14px;font-weight:700">${g.title}</div><div style="font-size:11px;color:var(--text2)">📁 ${g.cat}${g.deadline?` · ⏰ ${g.deadline}`:''} ${g.alarm?`· 🔔 ${g.alarm}`:''}</div></div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700">${g.title}</div><div style="font-size:11px;color:var(--text2)">📁 ${g.cat}${g.deadline?` · ⏰ ${g.deadline}`:''} ${g.alarm?`· 🔔 ${to12h(g.alarm)}`:''}</div></div>
         <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--gold)">${g.progress}%</div>
+        <button onclick="editGoal(${g.id})" style="background:none;border:1px solid rgba(0,212,255,0.3);color:var(--cyan);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:5px">✎</button>
         <button onclick="delGoal(${g.id})" style="background:none;border:none;color:var(--text3);cursor:pointer">✕</button>
       </div>
       <div class="goal-bar"><div class="goal-fill" style="width:${g.progress}%"></div></div>
@@ -1827,6 +2263,44 @@ function renderGoals(){
 function updateGoalProgress(id){const g=D.goals.find(g=>g.id===id);if(g){g.progress=parseInt(document.getElementById('gp-'+id).value)||0;save();renderGoals();}}
 function toggleMs(gid,idx){const g=D.goals.find(g=>g.id===gid);if(g?.milestones[idx]){g.milestones[idx].d=!g.milestones[idx].d;if(g.milestones[idx].d){gainXP(25);playSound('complete');}save();renderGoals();}}
 function delGoal(id){D.goals=D.goals.filter(g=>g.id!==id);save();renderGoals();}
+
+function editGoal(id){
+  const g=D.goals.find(g=>g.id===id);if(!g)return;
+  document.getElementById('modal-t').textContent='EDIT GOAL';
+  document.getElementById('modal-b').innerHTML=`
+    <div class="form-g"><label class="form-l">Goal Title</label><input class="form-i" id="eg-title" value="${g.title.replace(/"/g,'&quot;')}"/></div>
+    <div class="form-row">
+      <div class="form-g"><label class="form-l">Icon</label><input class="form-i" id="eg-icon" value="${g.icon}" maxlength="2"/></div>
+      <div class="form-g"><label class="form-l">Category</label><select class="form-i" id="eg-cat">
+        ${['Health','Career','Learning','Finance','Personal'].map(c=>`<option ${g.cat===c?'selected':''}>${c}</option>`).join('')}
+      </select></div>
+    </div>
+    <div class="form-g"><label class="form-l">Deadline</label><input class="form-i" id="eg-dl" type="date" value="${g.deadline||''}"/></div>
+    <div class="form-g"><label class="form-l">Milestones (one per line)</label><textarea class="form-i" id="eg-ms" rows="3" style="resize:vertical">${(g.milestones||[]).map(m=>m.t).join('\n')}</textarea></div>
+    <div class="alarm-section">
+      <div class="alarm-section-title">🔔 Alarm</div>
+      <div class="form-g" style="margin-bottom:0"><label class="form-l">Alarm Time</label><input class="form-i" id="eg-alarm" type="time" value="${g.alarm||''}"/></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-g" style="flex:1" onclick="saveEditGoal(${id})">💾 Save</button>
+      <button class="btn btn-r" onclick="closeModal()">Cancel</button>
+    </div>`;
+  openModal();
+}
+
+function saveEditGoal(id){
+  const g=D.goals.find(g=>g.id===id);if(!g)return;
+  g.title=document.getElementById('eg-title').value.trim()||g.title;
+  g.icon=document.getElementById('eg-icon').value||g.icon;
+  g.cat=document.getElementById('eg-cat').value;
+  g.deadline=document.getElementById('eg-dl').value;
+  const msRaw=(document.getElementById('eg-ms').value||'').split('\n').map(s=>s.trim()).filter(s=>s);
+  g.milestones=msRaw.map((t,i)=>({t,d:(g.milestones[i]?.t===t&&g.milestones[i]?.d)||false}));
+  const newAlarm=document.getElementById('eg-alarm').value||null;
+  if(newAlarm&&newAlarm!==g.alarm)schedRem(newAlarm,'Goal: '+g.title);
+  g.alarm=newAlarm;
+  save();closeModal();renderGoals();showToast('✅ Goal updated!');
+}
 
 // ===== CHARACTER =====
 const AVATARS=['🧙','⚔️','🏹','🛡️','🧝','🧛','🧟','🐉','🦸','🦹','🔮','⚡','🌟','💀','🎭','🧜','🐺','🦅','🔥','💎'];
@@ -2053,33 +2527,45 @@ function schedRem(timeStr,label){
 // ===== ALARM SYSTEM (rings properly) =====
 let alarmDismissed=new Set();
 let alarmAudio=null;
+let _lastAlarmDay='';
 function startAlarmCheck(){
   setInterval(()=>{
     const now=new Date();
     const ct=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     const sec=now.getSeconds();
-    // Check all tasks/habits/goals for alarms
+    const today=now.toDateString();
+    // Only clear dismissed alarms at start of new day
+    if(today!==_lastAlarmDay){_lastAlarmDay=today;alarmDismissed.clear();}
+    if(sec>15)return; // only check in first 15 seconds of each minute
     const allAlarmItems=[
-      ...D.tasks.daily.filter(t=>t.alarm),
-      ...D.tasks.weekly.filter(t=>t.alarm),
-      ...D.tasks.monthly.filter(t=>t.alarm),
+      ...D.tasks.daily.filter(t=>t.alarm&&!t.done),
+      ...D.tasks.weekly.filter(t=>t.alarm&&!t.done),
+      ...D.tasks.monthly.filter(t=>t.alarm&&!t.done),
       ...D.habits.filter(h=>h.alarm),
       ...D.goals.filter(g=>g.alarm)
     ];
     allAlarmItems.forEach(item=>{
-      const t=item.alarm;const key=`${item.id}-${ct}`;
-      if(t===ct&&sec<15&&!alarmDismissed.has(key)){
+      const alarmVal=item.alarm;
+      const key=`${item.id}-${today}-${alarmVal}`;
+      if(alarmVal===ct&&!alarmDismissed.has(key)){
         alarmDismissed.add(key);
         triggerAlarmOverlay(item.name||item.title,ct);
       }
     });
-    if(sec===0)alarmDismissed.clear();
   },1000);
+}
+
+function to12h(t24){
+  if(!t24)return'';
+  const[h,m]=t24.split(':').map(Number);
+  const ampm=h>=12?'PM':'AM';
+  const h12=h%12||12;
+  return`${h12}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
 function triggerAlarmOverlay(label,time){
   document.getElementById('alarm-overlay').classList.add('ringing');
-  document.getElementById('alarm-ov-time').textContent=time;
+  document.getElementById('alarm-ov-time').textContent=to12h(time);
   document.getElementById('alarm-ov-label').textContent=label;
   sendNotif('⏰ ALARM',label);
   playAlarmLoop();
