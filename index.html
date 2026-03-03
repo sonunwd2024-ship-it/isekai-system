@@ -2431,7 +2431,7 @@ function taskHTML(t,type,showSub=false){
   const sub=showSub&&t.sub?.length?`<div class="subtask-wrap">${t.sub.map((s,i)=>`<div class="subtask-item ${s.d?'done':''}" onclick="event.stopPropagation();toggleSub('${type}',${t.id},${i})"><div class="subtask-check">${s.d?'✓':''}</div><div class="subtask-title">${s.t}</div></div>`).join('')}</div>`:'';
   const isOverdue=!t.done&&t.time&&isTaskOverdue(t.time);
   return`<div class="task-item ${t.done?'done':''} ${isOverdue&&!t.done?'overdue-flash':''}" data-rank="${t.rank}">
-    <div class="task-check" onclick="event.stopPropagation();toggleTask('${type}',${t.id})" style="cursor:pointer;flex-shrink:0;${t.done?'background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(48,209,88,0.5);':'border-color:rgba(0,212,255,0.5);'}">${t.done?'✓':''}</div>
+    <div class="task-check" onclick="event.stopPropagation();toggleTask('${type}',${t.id},this)" style="cursor:pointer;flex-shrink:0;${t.done?'background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(48,209,88,0.5);':'border-color:rgba(0,212,255,0.5);'}">${t.done?'✓':''}</div>
     <div class="task-title" style="flex:1">${t.title}${isOverdue&&!t.done?'<span style="font-size:9px;color:var(--red);margin-left:6px;letter-spacing:1px">⚠ OVERDUE</span>':''}</div>
     <div class="task-meta">
       ${t.time?`<span class="task-time">⏰${to12h(t.time)}</span>`:''}
@@ -2541,12 +2541,12 @@ function spawnConfetti(){
   }
 }
 
-function toggleTask(type,id,event){
+function toggleTask(type,id,el){
   const t=D.tasks[type].find(t=>t.id===id);if(!t)return;
   t.done=!t.done;
   const xp=t.rank==='S'?100:t.rank==='A'?60:t.rank==='B'?30:10;
   if(t.done){
-    t.xpAwarded=xp; // track exactly what we gave
+    t.xpAwarded=xp;
     gainXP(xp);
     D.stats.totalDone++;
     if(type==='daily'){
@@ -2554,14 +2554,12 @@ function toggleTask(type,id,event){
       if(D.stats.streak>D.stats.bestStreak)D.stats.bestStreak=D.stats.streak;
       D.stats.lastTaskDate=todayStr();
     }
-    playSound('complete');
+    resumeAudio().then(()=>playSound('complete'));
     showToast(`✅ Quest done! +${xp} XP`);
-    const el=event?event.target:null;
-    spawnXPParticle(xp,el);
+    spawnXPParticle(xp, el||null);
     triggerCombo();
     if(type==='daily'&&D.tasks.daily.every(t=>t.done))spawnConfetti();
   } else {
-    // Remove exactly the XP that was awarded (not recalculated)
     const awarded=t.xpAwarded||xp;
     D.char.xp=Math.max(0,D.char.xp-awarded);
     t.xpAwarded=0;
@@ -2617,7 +2615,15 @@ function saveEditTask(type,id){
   t.alarm=newAlarm;
   save();closeModal();renderPage(curPage);showToast('✅ Quest updated!');
 }
-function gainXP(amt){D.char.xp+=amt;if(D.char.xp>=D.char.level*1000){D.char.level++;showToast(`🎉 LEVEL UP! Level ${D.char.level}!`);}save();updateXPBar();}
+function gainXP(amt){
+  D.char.xp+=amt;
+  if(D.char.xp>=D.char.level*1000){D.char.level++;showToast(`🎉 LEVEL UP! Level ${D.char.level}!`);}
+  save();
+  updateXPBar();
+  // Debounced leaderboard publish
+  if(window._lbPublishTimer)clearTimeout(window._lbPublishTimer);
+  window._lbPublishTimer=setTimeout(()=>publishToLeaderboard(),3000);
+}
 
 // ===== WEEKLY =====
 let wvm='list';
@@ -3520,15 +3526,6 @@ function shareScreenshot(){
   }
 }
 
-// Publish to leaderboard whenever XP changes
-const _origGainXP=gainXP;
-function gainXP(amt){
-  _origGainXP(amt);
-  // Debounced publish — don't spam Firestore on every XP gain
-  if(window._lbPublishTimer)clearTimeout(window._lbPublishTimer);
-  window._lbPublishTimer=setTimeout(()=>publishToLeaderboard(),3000);
-}
-
 
 function openModal(){document.getElementById('modal-overlay').classList.add('open');}
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
@@ -3540,9 +3537,15 @@ function sendNotif(title,body){if(Notification.permission==='granted')try{new No
 function toggleNotif(){document.getElementById('notif-panel').classList.toggle('open');document.getElementById('ndot').style.display='none';}
 function schedRem(timeStr,label){
   if(!timeStr)return;
-  const[h,m]=timeStr.split(':').map(Number);const now=new Date(),target=new Date();target.setHours(h,m,0,0);
+  const[h,m]=timeStr.split(':').map(Number);
+  const now=new Date(),target=new Date();
+  target.setHours(h,m,0,0);
   let delay=target-now;if(delay<0)delay+=86400000;
-  setTimeout(()=>{sendNotif('⚡ Isekai System',`⏰ Reminder: ${label}`);playSound('alarm');showToast(`🔔 ${label}`);},delay);
+  setTimeout(()=>{
+    sendNotif('⚡ HabitSolo',`⏰ Reminder: ${label}`);
+    resumeAudio().then(()=>playSound('alarm'));
+    showToast(`🔔 ${label}`);
+  },delay);
 }
 
 // ===== ALARM SYSTEM (rings properly) =====
@@ -3550,14 +3553,26 @@ let alarmDismissed=new Set();
 let alarmAudio=null;
 let _lastAlarmDay='';
 function startAlarmCheck(){
+  let _lastCheckedMinute='';
   setInterval(()=>{
     const now=new Date();
     const ct=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    const sec=now.getSeconds();
     const today=now.toDateString();
-    // Only clear dismissed alarms at start of new day
+
+    // Reset dismissed set on new day
     if(today!==_lastAlarmDay){_lastAlarmDay=today;alarmDismissed.clear();}
-    if(sec>15)return; // only check in first 15 seconds of each minute
+
+    // Midnight rollover check — if day changed since last open, run daily reset
+    const todayISO=todayStr();
+    if(D.stats.lastOpenDate && D.stats.lastOpenDate!==todayISO){
+      runDailyReset();
+      renderPage(curPage);
+    }
+
+    // Only fire alarm once per minute (not every second)
+    if(ct===_lastCheckedMinute)return;
+    _lastCheckedMinute=ct;
+
     const allAlarmItems=[
       ...D.tasks.daily.filter(t=>t.alarm&&!t.done),
       ...D.tasks.weekly.filter(t=>t.alarm&&!t.done),
@@ -3570,7 +3585,7 @@ function startAlarmCheck(){
       const key=`${item.id}-${today}-${alarmVal}`;
       if(alarmVal===ct&&!alarmDismissed.has(key)){
         alarmDismissed.add(key);
-        triggerAlarmOverlay(item.name||item.title,ct);
+        triggerAlarmOverlay(item.name||item.title, ct);
       }
     });
   },1000);
@@ -3589,7 +3604,7 @@ function triggerAlarmOverlay(label,time){
   document.getElementById('alarm-ov-time').textContent=to12h(time);
   document.getElementById('alarm-ov-label').textContent=label;
   sendNotif('⏰ ALARM',label);
-  playAlarmLoop();
+  resumeAudio().then(()=>playAlarmLoop());
 }
 function dismissAlarm(){
   document.getElementById('alarm-overlay').classList.remove('ringing');
@@ -3610,13 +3625,40 @@ function playAlarmLoop(){
 // ===== AUDIO =====
 let aCtx=null;
 function getACtx(){if(!aCtx)aCtx=new(window.AudioContext||window.webkitAudioContext)();return aCtx;}
+// Must call resumeAudio() on any user gesture before playing sounds
+function resumeAudio(){
+  try{
+    const ctx=getACtx();
+    if(ctx.state==='suspended')return ctx.resume();
+  }catch(e){}
+  return Promise.resolve();
+}
 function playSound(type){
   if(D.profile?.soundOn===false)return;
   try{
     const ctx=getACtx();
-    if(type==='complete'){[523,659,784,1047].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(0.1,ctx.currentTime+i*.1);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*.1+.3);o.start(ctx.currentTime+i*.1);o.stop(ctx.currentTime+i*.1+.3);});}
-    else if(type==='alarm'){for(let i=0;i<3;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.setValueAtTime(880,ctx.currentTime+i*.5);o.frequency.setValueAtTime(440,ctx.currentTime+i*.5+.25);g.gain.setValueAtTime(0.2,ctx.currentTime+i*.5);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*.5+.45);o.start(ctx.currentTime+i*.5);o.stop(ctx.currentTime+i*.5+.45);}}
-  }catch(e){}
+    if(ctx.state==='suspended'){ctx.resume().then(()=>playSound(type));return;}
+    if(type==='complete'){
+      [523,659,784,1047].forEach((f,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.frequency.value=f;o.type='sine';
+        g.gain.setValueAtTime(0.15,ctx.currentTime+i*.1);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*.1+.35);
+        o.start(ctx.currentTime+i*.1);o.stop(ctx.currentTime+i*.1+.4);
+      });
+    } else if(type==='alarm'){
+      for(let i=0;i<4;i++){
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.frequency.setValueAtTime(1047,ctx.currentTime+i*.45);
+        o.frequency.setValueAtTime(523,ctx.currentTime+i*.45+.2);
+        g.gain.setValueAtTime(0.3,ctx.currentTime+i*.45);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*.45+.4);
+        o.start(ctx.currentTime+i*.45);o.stop(ctx.currentTime+i*.45+.45);
+      }
+    }
+  }catch(e){console.warn('Sound error:',e);}
 }
 
 // ===== TOAST =====
