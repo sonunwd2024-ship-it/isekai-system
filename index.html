@@ -669,9 +669,11 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 
   // Detect if we're in a sandboxed/preview environment (no real hostname)
   const host = window.location.hostname;
-  const isSandbox = !host || host === '' || host === 'null' || 
+  const proto = window.location.protocol;
+  const isSandbox = !host || host === '' || host === 'null' ||
+                    host === 'localhost' || host === '127.0.0.1' ||
                     host.includes('claude.ai') || host.includes('anthropic') ||
-                    window.location.protocol === 'blob:';
+                    proto === 'blob:' || proto === 'file:';
 
   if (isSandbox) {
     // ── LOCAL MODE (preview / sandbox) ──────────────────────────────────────
@@ -722,7 +724,8 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
         measurementId: "G-S6JR6CBQLT"
       });
 
-      const authTimeout = setTimeout(() => { showAuthScreen(); }, 8000);
+      // Longer timeout for slow mobile connections
+      const authTimeout = setTimeout(() => { showAuthScreen(); }, 15000);
       firebase.auth().onAuthStateChanged((user) => {
         clearTimeout(authTimeout);
         if (user) { window._fbCurrentUser = user; window._fbLoadAndLaunch(user); }
@@ -730,9 +733,40 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
       });
     }).catch(err => {
       console.error('Firebase scripts failed to load:', err);
-      // Fall back to local mode gracefully
-      window._useFirebase = false;
-      showAuthScreen();
+      // Retry once after 3 seconds (handles slow mobile networks)
+      setTimeout(() => {
+        Promise.all([
+          loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app-compat.js`),
+          loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-auth-compat.js`),
+          loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-firestore-compat.js`),
+        ]).then(() => {
+          firebase.initializeApp({
+            apiKey: "AIzaSyBk2WFiBSh-_pHUGg41WO4EXDnD5f56UkQ",
+            authDomain: "habbit-tracking-7d28b.firebaseapp.com",
+            projectId: "habbit-tracking-7d28b",
+            storageBucket: "habbit-tracking-7d28b.firebasestorage.app",
+            messagingSenderId: "877678687023",
+            appId: "1:877678687023:web:030afc64583176be47a7da",
+            measurementId: "G-S6JR6CBQLT"
+          });
+          firebase.auth().onAuthStateChanged((user) => {
+            if (user) { window._fbCurrentUser = user; window._fbLoadAndLaunch(user); }
+            else { showAuthScreen(); }
+          });
+        }).catch(() => {
+          // Both attempts failed — fall back to local mode but warn the user
+          window._useFirebase = false;
+          window._firebaseFailed = true;
+          showAuthScreen();
+          setTimeout(() => {
+            const warn = document.createElement('div');
+            warn.id = 'firebase-warn';
+            warn.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#ff3b30;color:#fff;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;z-index:9999;text-align:center;max-width:300px;';
+            warn.innerHTML = '⚠️ No internet connection<br><span style="font-weight:400;font-size:11px">Leaderboard & sync unavailable. Your progress saves locally.</span>';
+            document.body.appendChild(warn);
+          }, 500);
+        });
+      }, 3000);
     });
   }
 })();
@@ -3567,6 +3601,14 @@ async function loadLeaderboard(){
   if(!window._useFirebase||typeof firebase==='undefined'){
     lbCache=padWithDemos([]);
     document.getElementById('lb-loading').style.display='none';
+    // Show offline warning if Firebase was supposed to work but failed
+    if(window._firebaseFailed){
+      const emptyEl=document.getElementById('lb-empty');
+      if(emptyEl){
+        emptyEl.style.display='block';
+        emptyEl.innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:28px;margin-bottom:8px">📡</div><div style="color:var(--red);font-weight:700;font-size:13px;margin-bottom:4px">No internet connection</div><div style="color:var(--text2);font-size:11px">Real leaderboard unavailable. Showing demo rivals.<br>Connect to Wi-Fi or mobile data to see live rankings.</div></div>';
+      }
+    }
     renderLbList(lbCache);
     return;
   }
