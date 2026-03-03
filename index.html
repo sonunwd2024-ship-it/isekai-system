@@ -3490,6 +3490,40 @@ async function publishToLeaderboard(){
   }catch(e){console.warn('LB publish failed:',e.code);}
 }
 
+// Demo rivals shown when real leaderboard has fewer than 5 players
+const DEMO_RIVALS=[
+  {uid:'_demo1',name:'ShadowMage',avatar:'🧙',cls:'Mage',level:7,xp:4200,streak:12,tasks:89},
+  {uid:'_demo2',name:'IronFist',avatar:'⚔️',cls:'Warrior',level:5,xp:2800,streak:8,tasks:61},
+  {uid:'_demo3',name:'StarVeil',avatar:'🌟',cls:'Rogue',level:9,xp:6100,streak:21,tasks:130},
+  {uid:'_demo4',name:'NovaByte',avatar:'🤖',cls:'Mage',level:4,xp:1500,streak:3,tasks:42},
+];
+
+function myLbEntry(){
+  return {
+    uid:currentUID,
+    name:D.profile?.name||D.char?.name||'You',
+    avatar:D.char?.avatar||'🧙',
+    profileImage:D.profile?.image||null,
+    cls:D.char?.cls||'Mage',
+    level:D.char?.level||1,
+    xp:D.char?.xp||0,
+    streak:D.stats?.bestStreak||0,
+    tasks:D.stats?.totalDone||0
+  };
+}
+
+function padWithDemos(realEntries){
+  // Always ensure current user is present
+  const hasMe = realEntries.some(p=>p.uid===currentUID);
+  let result = hasMe ? [...realEntries] : [myLbEntry(), ...realEntries];
+  // Pad with demo rivals (filtered out if a real user already has that uid) until ≥5 entries
+  if(result.length < 5){
+    const extras = DEMO_RIVALS.filter(d=>!result.some(p=>p.uid===d.uid));
+    result = [...result, ...extras].slice(0, Math.max(result.length, 5));
+  }
+  return result;
+}
+
 function setupRealtimeLeaderboard(){
   if(_lbUnsubscribe){_lbUnsubscribe();_lbUnsubscribe=null;}
   if(!window._useFirebase||typeof firebase==='undefined')return;
@@ -3501,22 +3535,28 @@ function setupRealtimeLeaderboard(){
       .orderBy('xp','desc')
       .limit(50)
       .onSnapshot(snap=>{
-        lbCache=snap.docs.map(d=>d.data());
+        const realData=snap.docs.map(d=>d.data());
+        lbCache=padWithDemos(realData);
         if(loading)loading.style.display='none';
-        if(lbCache.length===0){
-          document.getElementById('lb-empty').style.display='block';
-        } else {
-          document.getElementById('lb-empty').style.display='none';
-          renderLbList(lbCache);
-        }
+        document.getElementById('lb-empty').style.display='none';
+        renderLbList(lbCache);
         const live=document.getElementById('lb-live-dot');
         if(live){live.style.opacity='1';setTimeout(()=>live.style.opacity='0.4',600);}
       }, err=>{
         console.warn('LB listen failed:',err);
+        // On error, fall back to showing at least current user + demos
+        lbCache=padWithDemos([]);
+        if(loading)loading.style.display='none';
+        renderLbList(lbCache);
         const loading2=document.getElementById('lb-loading');
-        if(loading2)loading2.innerHTML='<div style="color:var(--text2);font-size:12px">⚠️ Check Firestore rules.</div>';
+        if(loading2)loading2.innerHTML='';
       });
-  }catch(e){console.warn('LB setup failed:',e);}
+  }catch(e){
+    console.warn('LB setup failed:',e);
+    lbCache=padWithDemos([]);
+    if(loading)loading.style.display='none';
+    renderLbList(lbCache);
+  }
 }
 
 async function loadLeaderboard(){
@@ -3525,23 +3565,7 @@ async function loadLeaderboard(){
   document.getElementById('lb-podium').innerHTML='';
   await publishToLeaderboard();
   if(!window._useFirebase||typeof firebase==='undefined'){
-    const demoRivals=[
-      {uid:'_demo1',name:'ShadowMage',avatar:'🧙',cls:'Mage',level:7,xp:4200,streak:12,tasks:89},
-      {uid:'_demo2',name:'IronFist',avatar:'⚔️',cls:'Warrior',level:5,xp:2800,streak:8,tasks:61},
-      {uid:'_demo3',name:'StarVeil',avatar:'🌟',cls:'Rogue',level:9,xp:6100,streak:21,tasks:130},
-      {uid:'_demo4',name:'NovaByte',avatar:'🤖',cls:'Mage',level:4,xp:1500,streak:3,tasks:42},
-    ];
-    lbCache=[{
-      uid:currentUID,
-      name:D.profile?.name||'You',
-      avatar:D.char?.avatar||'🧙',
-      profileImage:D.profile?.image||null,
-      cls:D.char?.cls||'Mage',
-      level:D.char?.level||1,
-      xp:D.char?.xp||0,
-      streak:D.stats?.bestStreak||0,
-      tasks:D.stats?.totalDone||0
-    },...demoRivals];
+    lbCache=padWithDemos([]);
     document.getElementById('lb-loading').style.display='none';
     renderLbList(lbCache);
     return;
@@ -3673,8 +3697,13 @@ function getTimeAgo(ts){
 }
 
 function renderLeaderboard(){
-  if(lbCache.length>0){renderLbList(lbCache);}
-  else{loadLeaderboard();}
+  if(lbCache.length>0){
+    const myIdx=lbCache.findIndex(p=>p.uid===currentUID);
+    if(myIdx>=0)lbCache[myIdx]=myLbEntry();
+    else lbCache=padWithDemos(lbCache.filter(p=>p.uid!==currentUID));
+    renderLbList(lbCache);
+  }
+  loadLeaderboard();
 }
 
 // Leaderboard info modal
