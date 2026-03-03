@@ -1495,7 +1495,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
         </div>
         <div class="lb-info-item">
           <div class="lb-info-icon">🔥</div>
-          <div><div class="lb-info-title">STREAK SCORE</div><div class="lb-info-desc">Your longest habit streak ever recorded. Keep completing habits daily to build your streak and climb the rankings!</div></div>
+          <div><div class="lb-info-title">STREAK SCORE</div><div class="lb-info-desc">Your longest habit streak ever recorded. Complete 3+ daily quests every day to earn your streak and climb the rankings!</div></div>
         </div>
         <div class="lb-info-item">
           <div class="lb-info-icon">✅</div>
@@ -1999,6 +1999,20 @@ async function loadUserData(uid, username){
   if(!D.char)    D.char={name:D.profile.name||username,avatar:'🧙',cls:'Mage',xp:0,level:1};
   if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
 
+  // ── STREAK SANITIZATION: fix any corrupted/fake streak values ─────────
+  // Streak can never be higher than total completed tasks (need 3 tasks per day)
+  const maxPossibleStreak = Math.floor((D.stats.totalDone||0) / 3);
+  if((D.stats.streak||0) > maxPossibleStreak){
+    D.stats.streak = maxPossibleStreak;
+  }
+  if((D.stats.bestStreak||0) > Math.max(maxPossibleStreak, D.stats.streak)){
+    D.stats.bestStreak = Math.max(maxPossibleStreak, D.stats.streak);
+  }
+  // bestStreak must always be >= current streak
+  if((D.stats.bestStreak||0) < (D.stats.streak||0)){
+    D.stats.bestStreak = D.stats.streak;
+  }
+
   // STEP 2: Update UI immediately from local data
   const displayName=D.profile.name||username;
   document.getElementById('sb-username').textContent=displayName;
@@ -2020,6 +2034,11 @@ async function loadUserData(uid, username){
           if(!D.goals)   D.goals=[];
           if(!D.char)    D.char={name:D.profile.name||username,avatar:'🧙',cls:'Mage',xp:0,level:1};
           if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
+          // Sanitize streak values from cloud too
+          const _mps=Math.floor((D.stats.totalDone||0)/3);
+          if((D.stats.streak||0)>_mps)D.stats.streak=_mps;
+          if((D.stats.bestStreak||0)>Math.max(_mps,D.stats.streak))D.stats.bestStreak=Math.max(_mps,D.stats.streak);
+          if((D.stats.bestStreak||0)<(D.stats.streak||0))D.stats.bestStreak=D.stats.streak;
           // Save to localStorage for next time
           localStorage.setItem(lsKey,JSON.stringify(D));
           // Update UI with cloud data
@@ -2149,7 +2168,7 @@ function generateAIInsight(){
     streak>=7?`⚡ ${streak}-day streak! You are in the top 5% of users!`:null,
     done===0&&hour>12?'💡 Tip: Starting with your easiest task builds momentum!':null,
     done>0&&done<total?`🎯 ${total-done} tasks left. You can finish them all today!`:null,
-    streak===0?'🌅 Start your streak today — even 1 task counts!':null,
+    streak===0?'🌅 Start your streak today — complete 3 tasks to build your streak!':null,
     `🧠 Peak focus hours: ${hour<12?'Morning power mode active!':hour<17?'Afternoon grind engaged!':'Evening warrior mode!'}`,
   ].filter(Boolean);
   return insights[Math.floor(Math.random()*insights.length)]||'🚀 Every task you complete makes you 1% better than yesterday!';
@@ -2582,11 +2601,14 @@ function toggleTask(type,id,el){
     D.stats.totalDone++;
     if(type==='daily'){
       const todayISO=todayStr();
-      if(D.stats.lastTaskDate!==todayISO){
+      const doneTodayCount=D.tasks.daily.filter(t=>t.done).length;
+      // Only increment streak once per day, and only after 3+ tasks completed
+      if(doneTodayCount===3 && D.stats.lastTaskDate!==todayISO){
         D.stats.streak++;
         if(D.stats.streak>D.stats.bestStreak)D.stats.bestStreak=D.stats.streak;
+        D.stats.lastTaskDate=todayISO;
+        showToast('🔥 3 quests done — streak +1!');
       }
-      D.stats.lastTaskDate=todayISO;
     }
     resumeAudio().then(()=>playSound('complete'));
     showToast(`✅ Quest done! +${xp} XP`);
@@ -2599,10 +2621,13 @@ function toggleTask(type,id,el){
     t.xpAwarded=0;
     D.stats.totalDone=Math.max(0,D.stats.totalDone-1);
     if(type==='daily'){
-      // Only decrement streak if no other tasks were completed today
+      // Revert streak if unchecking drops below 3 tasks for today
       const todayISO=todayStr();
-      const anyDoneToday=D.tasks.daily.some(t=>t.done&&t.id!==id);
-      if(!anyDoneToday){D.stats.streak=Math.max(0,D.stats.streak-1);D.stats.lastTaskDate=null;}
+      const doneTodayAfterUncheck=D.tasks.daily.filter(t=>t.done&&t.id!==id).length;
+      if(D.stats.lastTaskDate===todayISO&&doneTodayAfterUncheck<3){
+        D.stats.streak=Math.max(0,D.stats.streak-1);
+        D.stats.lastTaskDate=null;
+      }
     }
     updateXPBar();
   }
@@ -3500,6 +3525,12 @@ async function loadLeaderboard(){
   document.getElementById('lb-podium').innerHTML='';
   await publishToLeaderboard();
   if(!window._useFirebase||typeof firebase==='undefined'){
+    const demoRivals=[
+      {uid:'_demo1',name:'ShadowMage',avatar:'🧙',cls:'Mage',level:7,xp:4200,streak:12,tasks:89},
+      {uid:'_demo2',name:'IronFist',avatar:'⚔️',cls:'Warrior',level:5,xp:2800,streak:8,tasks:61},
+      {uid:'_demo3',name:'StarVeil',avatar:'🌟',cls:'Rogue',level:9,xp:6100,streak:21,tasks:130},
+      {uid:'_demo4',name:'NovaByte',avatar:'🤖',cls:'Mage',level:4,xp:1500,streak:3,tasks:42},
+    ];
     lbCache=[{
       uid:currentUID,
       name:D.profile?.name||'You',
@@ -3510,11 +3541,23 @@ async function loadLeaderboard(){
       xp:D.char?.xp||0,
       streak:D.stats?.bestStreak||0,
       tasks:D.stats?.totalDone||0
-    }];
+    },...demoRivals];
     document.getElementById('lb-loading').style.display='none';
     renderLbList(lbCache);
     return;
   }
+  setupRealtimeLeaderboard();
+
+
+
+
+
+
+
+
+
+
+
   setupRealtimeLeaderboard();
 }
 
