@@ -1933,7 +1933,7 @@ function runDailyReset(){
   }
 
   // ── HISTORY: record activity for heatmap ──────────────────────────────
-  const doneCt = D.tasks.daily.length; // will be 0 after reset, track pre-reset
+  const doneCt = D.tasks.daily.filter(t=>t.done).length; // count completed tasks BEFORE reset
   D.stats.history = D.stats.history || [];
   D.stats.history.push(doneCt);
   if(D.stats.history.length > 30) D.stats.history.shift();
@@ -2090,10 +2090,10 @@ function seed(){
     {id:21,title:'Read 4 books',rank:'A',cat:'Learning',done:false,sub:[],deadline:d(28),alarm:null},
   ];
   if(!D.habits.length)D.habits=[
-    {id:1,name:'Morning Meditation',emoji:'🧘',target:1,color:'#00d4ff',done:0,streak:7,alarm:null},
-    {id:2,name:'Exercise',emoji:'💪',target:1,color:'#30d158',done:0,streak:14,alarm:'07:00'},
-    {id:3,name:'Read Books',emoji:'📚',target:1,color:'#bf5af2',done:0,streak:3,alarm:'21:00'},
-    {id:4,name:'Drink Water',emoji:'💧',target:8,color:'#00d4ff',done:3,streak:5,alarm:null},
+    {id:1,name:'Morning Meditation',emoji:'🧘',target:1,color:'#00d4ff',done:0,streak:0,alarm:null},
+    {id:2,name:'Exercise',emoji:'💪',target:1,color:'#30d158',done:0,streak:0,alarm:'07:00'},
+    {id:3,name:'Read Books',emoji:'📚',target:1,color:'#bf5af2',done:0,streak:0,alarm:'21:00'},
+    {id:4,name:'Drink Water',emoji:'💧',target:8,color:'#00d4ff',done:0,streak:0,alarm:null},
   ];
   if(!D.goals.length)D.goals=[
     {id:1,title:'Master a new skill',icon:'🎓',deadline:d(180),progress:35,cat:'Learning',milestones:[{t:'Complete beginner course',d:true},{t:'Build practice project',d:false},{t:'Teach someone else',d:false}],alarm:null},
@@ -2429,12 +2429,20 @@ function renderProgress(){
   vals.forEach(([v,l,f])=>{document.getElementById(l).textContent=v+'%';document.getElementById(f).style.width=v+'%';});
   const vel=document.getElementById('vel-chart');
   const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const data=D.stats.history.length>=7?D.stats.history.slice(-7):[3,5,4,7,5,6,D.tasks.daily.filter(t=>t.done).length||1];
+  const hist7=Array.from({length:7},(_,i)=>D.stats.history[D.stats.history.length-7+i]||0);
+  const data=hist7;
   const mx=Math.max(...data)||1;
   vel.innerHTML=data.map((v,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center"><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="width:100%;height:${(v/mx*90)+10}%;background:linear-gradient(to top,var(--cyan),var(--purple));border-radius:3px 3px 0 0;opacity:${i===6?1:0.55}"></div></div><div style="font-size:9px;color:var(--text2);margin-top:2px">${v}</div></div>`).join('');
   document.getElementById('vel-labels').innerHTML=days.map(d=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--text3)">${d}</div>`).join('');
   const hm=document.getElementById('p-heatmap');hm.innerHTML='';
-  for(let i=0;i<28;i++){const l=['','l1','l2','l3','l4'][Math.floor(Math.random()*5)];hm.innerHTML+=`<div class="hm-cell ${l}" title="Day ${i+1}"></div>`;}
+  const hmHist=D.stats.history||[];
+  const hmMax=Math.max(...hmHist,1);
+  for(let i=0;i<28;i++){
+    const v=hmHist[hmHist.length-28+i]||0;
+    const pct=v/hmMax;
+    const l=pct===0?'':pct<0.25?'l1':pct<0.5?'l2':pct<0.75?'l3':'l4';
+    hm.innerHTML+=`<div class="hm-cell ${l}" title="Day ${i+1}: ${v} done"></div>`;
+  }
   document.getElementById('an-total').textContent=D.stats.totalDone;
   document.getElementById('an-streak').textContent=D.stats.bestStreak;
   document.getElementById('an-pomo').textContent=D.stats.pomodoros;
@@ -2573,9 +2581,12 @@ function toggleTask(type,id,el){
     gainXP(xp);
     D.stats.totalDone++;
     if(type==='daily'){
-      D.stats.streak++;
-      if(D.stats.streak>D.stats.bestStreak)D.stats.bestStreak=D.stats.streak;
-      D.stats.lastTaskDate=todayStr();
+      const todayISO=todayStr();
+      if(D.stats.lastTaskDate!==todayISO){
+        D.stats.streak++;
+        if(D.stats.streak>D.stats.bestStreak)D.stats.bestStreak=D.stats.streak;
+      }
+      D.stats.lastTaskDate=todayISO;
     }
     resumeAudio().then(()=>playSound('complete'));
     showToast(`✅ Quest done! +${xp} XP`);
@@ -2587,7 +2598,12 @@ function toggleTask(type,id,el){
     D.char.xp=Math.max(0,D.char.xp-awarded);
     t.xpAwarded=0;
     D.stats.totalDone=Math.max(0,D.stats.totalDone-1);
-    if(type==='daily')D.stats.streak=Math.max(0,D.stats.streak-1);
+    if(type==='daily'){
+      // Only decrement streak if no other tasks were completed today
+      const todayISO=todayStr();
+      const anyDoneToday=D.tasks.daily.some(t=>t.done&&t.id!==id);
+      if(!anyDoneToday){D.stats.streak=Math.max(0,D.stats.streak-1);D.stats.lastTaskDate=null;}
+    }
     updateXPBar();
   }
   save();renderPage(curPage);
@@ -2640,7 +2656,7 @@ function saveEditTask(type,id){
 }
 function gainXP(amt){
   D.char.xp+=amt;
-  if(D.char.xp>=D.char.level*1000){D.char.level++;showToast(`🎉 LEVEL UP! Level ${D.char.level}!`);}
+  while(D.char.xp>=D.char.level*1000){D.char.level++;showToast(`🎉 LEVEL UP! Level ${D.char.level}!`);}
   save();
   updateXPBar();
   // Debounced leaderboard publish
@@ -2871,8 +2887,15 @@ function renderHabits(){
     }).join('')||'<div class="empty-state"><div class="ei">🔥</div><div class="et">Forge your first habit!</div></div>';
   }
 
-  const hm=document.getElementById('habit-heatmap');hm.innerHTML='';
-  for(let i=0;i<28;i++){const l=['','l1','l2','l3','l4'][Math.floor(Math.random()*5)];hm.innerHTML+=`<div class="hm-cell ${l}"></div>`;}
+  const hmH=document.getElementById('habit-heatmap');hmH.innerHTML='';
+  const hmHistH=D.stats.history||[];
+  const hmMaxH=Math.max(...hmHistH,1);
+  for(let i=0;i<28;i++){
+    const v=hmHistH[hmHistH.length-28+i]||0;
+    const pct=v/hmMaxH;
+    const l=pct===0?'':pct<0.25?'l1':pct<0.5?'l2':pct<0.75?'l3':'l4';
+    hmH.innerHTML+=`<div class="hm-cell ${l}" title="${v} done"></div>`;
+  }
 }
 function logHabit(id){
   const h=D.habits.find(h=>h.id===id);if(!h)return;
@@ -2905,6 +2928,12 @@ function editHabit(id){
       <div class="form-g"><label class="form-l">Daily Target</label><input class="form-i" id="eh-target" type="number" value="${h.target}" min="1"/></div>
     </div>
     <div class="form-g"><label class="form-l">Color</label><input class="form-i" id="eh-color" type="color" value="${h.color||'#00d4ff'}"/></div>
+    <div class="form-g"><label class="form-l">Difficulty (affects XP earned)</label><select class="form-i" id="eh-diff">
+      <option value="0.5" ${(h.diff||1)<=0.5?'selected':''}>Easy (0.5x XP)</option>
+      <option value="1" ${(!h.diff||h.diff===1)?'selected':''}>Normal (1x XP)</option>
+      <option value="1.5" ${(h.diff||1)===1.5?'selected':''}>Hard (1.5x XP)</option>
+      <option value="2" ${(h.diff||1)>=2?'selected':''}>Extreme (2x XP)</option>
+    </select></div>
     <div class="alarm-section">
       <div class="alarm-section-title">🔔 Alarm</div>
       <div class="form-g" style="margin-bottom:0"><label class="form-l">Alarm Time</label><input class="form-i" id="eh-alarm" type="time" value="${h.alarm||''}"/></div>
@@ -2922,6 +2951,7 @@ function saveEditHabit(id){
   h.emoji=document.getElementById('eh-emoji').value||h.emoji;
   h.target=parseInt(document.getElementById('eh-target').value)||1;
   h.color=document.getElementById('eh-color').value;
+  h.diff=parseFloat(document.getElementById('eh-diff')?.value||1);
   const newAlarm=document.getElementById('eh-alarm').value||null;
   if(newAlarm&&newAlarm!==h.alarm)schedRem(newAlarm,'Habit: '+h.name);
   h.alarm=newAlarm;
