@@ -1387,6 +1387,16 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
                 <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:4px">LOGGED IN AS</div>
                 <div style="font-size:13px;font-weight:700;color:var(--cyan)" id="profile-email-disp">—</div>
                 <div style="font-size:11px;color:var(--text2);margin-top:2px" id="profile-uid-disp"></div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px" id="profile-joined-disp"></div>
+              </div>
+              <!-- Username Change -->
+              <div style="background:rgba(191,90,242,0.05);border:1px solid rgba(191,90,242,0.2);border-radius:10px;padding:12px;margin-bottom:12px">
+                <div style="font-size:10px;color:var(--purple);letter-spacing:1px;margin-bottom:6px;font-weight:700">✏️ CHANGE USERNAME</div>
+                <div style="font-size:10px;color:var(--text2);margin-bottom:8px">Your login username (used to sign in). Must be unique across all users.</div>
+                <input class="form-i" id="new-username-inp" placeholder="New username..." style="margin-bottom:6px"/>
+                <div style="font-size:10px;color:var(--red);min-height:14px;margin-bottom:4px" id="username-change-err"></div>
+                <div style="font-size:10px;color:var(--green);min-height:14px;margin-bottom:4px" id="username-change-ok"></div>
+                <button class="btn btn-p" onclick="changeUsername()" style="width:100%">✏️ Change Username</button>
               </div>
               <button class="btn btn-c" onclick="doAddAccount()" style="width:100%;margin-bottom:8px">➕ Add / Switch Account</button>
               <button class="btn btn-r" onclick="doLogout()" style="width:100%;margin-bottom:8px">⏏ Log Out</button>
@@ -1443,6 +1453,12 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
           <button class="lb-tab active" id="lbtab-xp" onclick="setLbTab('xp')">⚡ XP</button>
           <button class="lb-tab" id="lbtab-streak" onclick="setLbTab('streak')">🔥 STREAK</button>
           <button class="lb-tab" id="lbtab-tasks" onclick="setLbTab('tasks')">✅ QUESTS</button>
+        </div>
+
+        <!-- ── SEARCH ── -->
+        <div style="position:relative;margin-bottom:12px">
+          <input class="form-i" id="lb-search-inp" placeholder="🔍 Search hero by name..." oninput="filterLeaderboard()" style="padding-left:14px;font-size:12px"/>
+          <button onclick="document.getElementById('lb-search-inp').value='';filterLeaderboard();" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px" title="Clear">✕</button>
         </div>
 
         <!-- ── TOP 3 PODIUM ── -->
@@ -2051,7 +2067,7 @@ function freshData(username='Hero'){
     tasks:{daily:[],weekly:[],monthly:[]},
     habits:[],goals:[],alarms:[],
     char:{name:username,avatar:'🧙',cls:'Mage',xp:0,level:1},
-    profile:{name:username,status:'',dailyGoal:5,image:null,soundOn:true},
+    profile:{name:username,status:'',dailyGoal:5,image:null,soundOn:true,joinedAt:new Date().toISOString()},
     stats:{totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null}
   };
 }
@@ -2281,6 +2297,12 @@ const INFO_FEATURES=[
   {icon:'👤',title:'Profile — Your Identity',desc:'Upload a photo from your gallery or choose an emoji avatar. The same photo shows in the sidebar and topbar everywhere!',kid:'🖼️ Like decorating your own locker with your photo and cool stats!'},
   {icon:'🔐',title:'Login & Signup — Your Account',desc:'Create a personal account. Your data is saved separately for each user on this device. Log out anytime to protect your data.',kid:'🔑 Like having your own secret room that only you can open with your special key!'},
   {icon:'📊',title:'Progress Tracker — See Your Growth',desc:'View completion rates, 7-day velocity chart, and 28-day activity heatmap. See how far you\'ve come!',kid:'📈 Like a report card that shows all your amazing progress — but the good kind!'},
+  {icon:'✏️',title:'Username Change — Your Identity',desc:'Change your login username anytime from the Profile → Account section. It checks for uniqueness before saving — no duplicates allowed!',kid:'🎭 Like choosing a new hero name — just make sure nobody else has it!'},
+  {icon:'📝',title:'Task Notes — Add Extra Details',desc:'When adding any quest, you can write notes — extra details, links, reminders. Notes are saved with the task and shown when you expand it.',kid:'📋 Like writing a secret tip on the back of your quest scroll!'},
+  {icon:'⚖️',title:'Habit Difficulty — Choose Your Challenge',desc:'When forging a habit, pick a difficulty: Easy (0.5x XP), Normal (1x), Hard (1.5x), or Extreme (2x). Harder habits reward more XP!',kid:'🏋️ Like choosing Easy, Normal, or Hard mode in a game — harder = bigger reward!'},
+  {icon:'🔍',title:'Leaderboard Search — Find Any Hero',desc:'Use the search bar on the leaderboard to filter by hero name instantly. Great for finding friends or tracking rivals!',kid:'🔎 Like using a radar to find your friends in a giant battle arena!'},
+  {icon:'⏰',title:'True Background Alarms — Never Miss a Task',desc:'Alarms now use a Service Worker that runs outside the browser tab. They ring even when your phone is locked or the app is closed — with vibration and a persistent lock-screen notification!',kid:'🔔 Like having a real alarm clock that rings even when your phone is sleeping!'},
+  {icon:'🔒',title:'Leaderboard Security — Fair Play Enforced',desc:'Firebase rules ensure XP can only go up (never cheated down), level is validated against XP, and only you can edit your own score. All 9 leaderboard fields are type-checked — no injections possible.',kid:'🛡️ Like a security guard who checks your ID before letting you onto the scoreboard!'},
 ];
 
 function openInfoModal(){
@@ -2429,6 +2451,7 @@ function isTaskOverdue(timeStr){
 
 function taskHTML(t,type,showSub=false){
   const sub=showSub&&t.sub?.length?`<div class="subtask-wrap">${t.sub.map((s,i)=>`<div class="subtask-item ${s.d?'done':''}" onclick="event.stopPropagation();toggleSub('${type}',${t.id},${i})"><div class="subtask-check">${s.d?'✓':''}</div><div class="subtask-title">${s.t}</div></div>`).join('')}</div>`:'';
+  const notesBlock=showSub&&t.notes?`<div style="padding:5px 8px 6px 34px;font-size:10px;color:var(--text2);line-height:1.5;background:rgba(0,212,255,0.03);border-left:2px solid rgba(0,212,255,0.2);margin:0 8px 6px 8px;border-radius:0 4px 4px 0">📝 ${t.notes}</div>`:'';
   const isOverdue=!t.done&&t.time&&isTaskOverdue(t.time);
   return`<div class="task-item ${t.done?'done':''} ${isOverdue&&!t.done?'overdue-flash':''}" data-rank="${t.rank}">
     <div class="task-check" onclick="event.stopPropagation();toggleTask('${type}',${t.id},this)" style="cursor:pointer;flex-shrink:0;${t.done?'background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(48,209,88,0.5);':'border-color:rgba(0,212,255,0.5);'}">${t.done?'✓':''}</div>
@@ -2441,7 +2464,7 @@ function taskHTML(t,type,showSub=false){
     </div>
     <button class="task-edit-btn" onclick="event.stopPropagation();editTask('${type}',${t.id})" title="Edit">✎</button>
     <button class="task-del" onclick="event.stopPropagation();delTask('${type}',${t.id})">✕</button>
-  </div>${sub}`;
+  </div>${sub}${notesBlock}`;
 }
 
 function sortTasksByTimeAndDone(tasks){
@@ -2805,6 +2828,7 @@ function renderHabits(){
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
             <span style="font-size:13px;font-weight:700">${h.name}</span>
             <span class="streak-flame ${flameClass}">${flameIcon} ${streak}d</span>
+            ${h.diff&&h.diff!==1?`<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:${h.diff>=2?'rgba(255,55,95,0.15)':h.diff>=1.5?'rgba(255,159,10,0.15)':'rgba(48,209,88,0.1)'};color:${h.diff>=2?'var(--red)':h.diff>=1.5?'var(--orange)':'var(--green)'}">${h.diff>=2?'EXTREME':h.diff>=1.5?'HARD':h.diff<=0.5?'EASY':'NORMAL'} ${h.diff}x</span>`:''}
           </div>
           <div class="chain-links">${chainLinks}</div>
           <div style="font-size:10px;color:var(--text3);margin-top:3px">${h.done||0}/${h.target} today</div>
@@ -2831,6 +2855,7 @@ function renderHabits(){
             <span style="font-size:13px;font-weight:700">${h.name}</span>
             ${isDone?`<span style="background:rgba(48,209,88,0.15);color:var(--green);font-size:9px;padding:2px 6px;border-radius:8px">DONE ✓</span>`:''}
             <span class="streak-flame ${flameClass}">${flameIcon} ${streak}d</span>
+            ${h.diff&&h.diff!==1?`<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:${h.diff>=2?'rgba(255,55,95,0.15)':h.diff>=1.5?'rgba(255,159,10,0.15)':'rgba(48,209,88,0.1)'};color:${h.diff>=2?'var(--red)':h.diff>=1.5?'var(--orange)':'var(--green)'}">${h.diff>=2?'EXTREME':h.diff>=1.5?'HARD':h.diff<=0.5?'EASY':'NORMAL'} ${h.diff}x</span>`:''}
             ${h.alarm?`<span style="font-size:10px;color:var(--orange)">🔔${to12h(h.alarm)}</span>`:''}
           </div>
           <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${h.done||0}/${h.target} done today</div>
@@ -2859,9 +2884,12 @@ function logHabit(id){
     h.streak=(h.streak||0)+1;
     h.lastCompletedDate=today;
     if(h.streak>D.stats.bestStreak)D.stats.bestStreak=h.streak;
-    gainXP(20);
+    const diffMult=h.diff||1;
+    const xpEarned=Math.round(20*diffMult);
+    gainXP(xpEarned);
     playSound('complete');
-    showToast(`🔥 ${h.name} — ${h.streak} day streak!`);
+    const diffLabel=diffMult>=2?' 🔴EXTREME':diffMult>=1.5?' 🟠HARD':diffMult<=0.5?' 🟢EASY':'';
+    showToast(`🔥 ${h.name} — ${h.streak} day streak! +${xpEarned}XP${diffLabel}`);
   }
   save();renderHabits();
 }
@@ -3007,6 +3035,20 @@ function renderProfile(){
     }
   }
   if(uidEl)uidEl.textContent=currentUID?'UID: '+currentUID.slice(0,16)+'...':'';
+  // Show joined date
+  const joinedEl=document.getElementById('profile-joined-disp');
+  if(joinedEl){
+    const joined=D.profile?.joinedAt||D.stats?.firstOpenDate||null;
+    if(joined){
+      const d=new Date(joined);
+      joinedEl.textContent='⚔️ Hero since '+d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    }
+  }
+  // Populate username change input with current display name hint
+  const unInp=document.getElementById('new-username-inp');
+  if(unInp&&!unInp.value&&window._useFirebase&&firebase.auth?.().currentUser){
+    unInp.placeholder=firebase.auth().currentUser.displayName||'New username...';
+  }
 }
 function triggerProfileUpload(){document.getElementById('profile-img-input').click();}
 function handleProfileImage(e){
@@ -3020,6 +3062,66 @@ function handleProfileImage(e){
   reader.readAsDataURL(file);
 }
 function updateProfileName(){D.profile.name=document.getElementById('profile-name-inp').value;D.char.name=D.profile.name;document.getElementById('profile-name-disp').textContent=D.profile.name;}
+async function changeUsername(){
+  const errEl=document.getElementById('username-change-err');
+  const okEl=document.getElementById('username-change-ok');
+  errEl.textContent='';okEl.textContent='';
+  const newName=document.getElementById('new-username-inp').value.trim();
+  if(!newName){errEl.textContent='Please enter a new username.';return;}
+  if(newName.length<3){errEl.textContent='Username must be at least 3 characters.';return;}
+  if(newName.length>30){errEl.textContent='Username must be 30 characters or less.';return;}
+  if(!/^[a-zA-Z0-9_]+$/.test(newName)){errEl.textContent='Only letters, numbers, and underscores allowed.';return;}
+
+  // Local mode — just update display name
+  if(!window._useFirebase){
+    D.profile.name=newName;D.char.name=newName;
+    document.getElementById('sb-username').textContent=newName;
+    document.getElementById('topbar-uname').textContent=newName;
+    document.getElementById('profile-name-disp').textContent=newName;
+    saveImmediate().then(()=>{okEl.textContent='✅ Username updated!';document.getElementById('new-username-inp').value='';});
+    return;
+  }
+
+  // Firebase mode — check uniqueness then update
+  try{
+    const db=firebase.firestore();
+    const lower=newName.toLowerCase();
+    const snap=await db.doc('usernames/'+lower).get();
+    if(snap.exists&&snap.data().uid!==currentUID){
+      errEl.textContent='❌ Username already taken. Try another.';return;
+    }
+    // Get old username to delete
+    const currentUser=firebase.auth().currentUser;
+    if(!currentUser){errEl.textContent='Not logged in.';return;}
+    const oldName=currentUser.displayName||'';
+
+    // Write new username doc
+    await db.doc('usernames/'+lower).set({uid:currentUID,email:currentUser.email||''});
+
+    // Delete old username doc if different
+    if(oldName&&oldName.toLowerCase()!==lower){
+      try{await db.doc('usernames/'+oldName.toLowerCase()).delete();}catch(_){}
+    }
+
+    // Update Firebase Auth display name
+    await currentUser.updateProfile({displayName:newName});
+
+    // Update local data
+    D.profile.name=newName;D.char.name=newName;
+    document.getElementById('sb-username').textContent=newName;
+    document.getElementById('topbar-uname').textContent=newName;
+    document.getElementById('profile-name-disp').textContent=newName;
+    await saveImmediate();
+    await publishToLeaderboard();
+    okEl.textContent='✅ Username changed to "'+newName+'"!';
+    document.getElementById('new-username-inp').value='';
+    showToast('✅ Username changed to '+newName+'!');
+  }catch(e){
+    errEl.textContent='Error: '+(e.message||'Could not change username.');
+    console.error('changeUsername error:',e);
+  }
+}
+
 function saveProfile(){
   // Read values
   const nameVal = document.getElementById('profile-name-inp').value.trim();
@@ -3106,6 +3208,7 @@ function openAddTask(type){
     ${type==='weekly'?`<div class="form-g"><label class="form-l">Day of Week</label><select class="form-i" id="ft-day"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option></select></div>`:''}
     ${type!=='daily'?`<div class="form-g"><label class="form-l">Deadline</label><input class="form-i" id="ft-deadline" type="date"/></div>`:''}
     <div class="form-g"><label class="form-l">Subtasks (one per line, optional)</label><textarea class="form-i" id="ft-sub" rows="2" placeholder="Step 1&#10;Step 2" style="resize:vertical"></textarea></div>
+    <div class="form-g"><label class="form-l">Notes (optional)</label><textarea class="form-i" id="ft-notes" rows="2" placeholder="Extra details, links, reminders..." style="resize:vertical"></textarea></div>
     ${alarmSection('ft-alarm')}
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn btn-c" style="flex:1" onclick="submitTask('${type}')">✦ Add</button>
@@ -3118,7 +3221,8 @@ function submitTask(type){
   const title=document.getElementById('ft-title').value.trim();if(!title)return;
   const sub=(document.getElementById('ft-sub').value||'').split('\n').map(s=>s.trim()).filter(s=>s).map(t=>({t,d:false}));
   const alarmTime=document.getElementById('ft-alarm')?.value||null;
-  const t={id:Date.now(),title,rank:document.getElementById('ft-rank').value,cat:document.getElementById('ft-cat').value,done:false,sub,alarm:alarmTime||null};
+  const notes=(document.getElementById('ft-notes')?.value||'').trim();
+  const t={id:Date.now(),title,rank:document.getElementById('ft-rank').value,cat:document.getElementById('ft-cat').value,done:false,sub,notes:notes||null,alarm:alarmTime||null};
   if(type==='daily'&&document.getElementById('ft-time'))t.time=document.getElementById('ft-time').value;
   if(type==='weekly'&&document.getElementById('ft-day'))t.day=document.getElementById('ft-day').value;
   if(document.getElementById('ft-deadline'))t.deadline=document.getElementById('ft-deadline').value;
@@ -3135,6 +3239,7 @@ function openAddHabit(){
       <div class="form-g"><label class="form-l">Daily Target</label><input class="form-i" id="fh-target" type="number" value="1" min="1"/></div>
     </div>
     <div class="form-g"><label class="form-l">Color</label><input class="form-i" id="fh-color" type="color" value="#00d4ff"/></div>
+    <div class="form-g"><label class="form-l">Difficulty (affects XP earned)</label><select class="form-i" id="fh-diff"><option value="0.5">Easy (0.5x XP)</option><option value="1" selected>Normal (1x XP)</option><option value="1.5">Hard (1.5x XP)</option><option value="2">Extreme (2x XP)</option></select></div>
     ${alarmSection('fh-alarm')}
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn btn-p" style="flex:1" onclick="submitHabit()">🔥 Forge</button>
@@ -3146,7 +3251,8 @@ function openAddHabit(){
 function submitHabit(){
   const name=document.getElementById('fh-name').value.trim();if(!name)return;
   const alarmTime=document.getElementById('fh-alarm')?.value||null;
-  const h={id:Date.now(),name,emoji:document.getElementById('fh-emoji').value||'🔥',target:parseInt(document.getElementById('fh-target').value)||1,color:document.getElementById('fh-color').value,done:0,streak:0,alarm:alarmTime||null};
+  const diff=parseFloat(document.getElementById('fh-diff')?.value||1);
+  const h={id:Date.now(),name,emoji:document.getElementById('fh-emoji').value||'🔥',target:parseInt(document.getElementById('fh-target').value)||1,color:document.getElementById('fh-color').value,done:0,streak:0,diff:diff,alarm:alarmTime||null};
   if(alarmTime)schedRem(alarmTime,'Habit: '+name);
   D.habits.push(h);save();closeModal();renderPage(curPage);showToast('🔥 Habit forged!');
 }
@@ -3278,6 +3384,13 @@ function buildAvatarHTML(p, size=38, extraClass=''){
     return `<img src="${img}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:50%" class="${extraClass}">`;
   }
   return `<div class="lb-av-emoji ${extraClass}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.52)}px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.04);border-radius:50%">${emoji}</div>`;
+}
+
+function filterLeaderboard(){
+  const q=(document.getElementById('lb-search-inp')?.value||'').trim().toLowerCase();
+  if(!q){renderLbList(lbCache);return;}
+  const filtered=lbCache.filter(p=>(p.name||'').toLowerCase().includes(q));
+  renderLbList(filtered);
 }
 
 function setLbTab(tab){
