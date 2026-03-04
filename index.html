@@ -728,6 +728,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
       const authTimeout = setTimeout(() => { showAuthScreen(); }, 15000);
       firebase.auth().onAuthStateChanged((user) => {
         clearTimeout(authTimeout);
+        if (window._signingUp) return; // signup flow handles launch itself after writing /usernames
         if (user) { window._fbCurrentUser = user; window._fbLoadAndLaunch(user); }
         else { showAuthScreen(); }
       });
@@ -750,6 +751,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
             measurementId: "G-S6JR6CBQLT"
           });
           firebase.auth().onAuthStateChanged((user) => {
+            if (window._signingUp) return;
             if (user) { window._fbCurrentUser = user; window._fbLoadAndLaunch(user); }
             else { showAuthScreen(); }
           });
@@ -1856,11 +1858,15 @@ async function doSignup(){
     const db=firebase.firestore();
     const unSnap=await db.doc('usernames/'+user.toLowerCase()).get();
     if(unSnap.exists){errEl.textContent='Username already taken.';okEl.textContent='';return;}
+    window._signingUp=true;
     const cred=await firebase.auth().createUserWithEmailAndPassword(email,pass);
     await cred.user.updateProfile({displayName:user});
     await db.doc('usernames/'+user.toLowerCase()).set({email,uid:cred.user.uid});
+    window._signingUp=false;
     okEl.textContent='✅ Account created! Loading your dashboard...';
+    window._fbLoadAndLaunch(cred.user);
   }catch(e){
+    window._signingUp=false;
     okEl.textContent='';
     errEl.textContent=
       e.code==='auth/email-already-in-use'?'Email already registered.':
