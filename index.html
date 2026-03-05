@@ -303,65 +303,143 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 
 /* ===== FUTURISTIC HEATMAP ===== */
 /* ===== FUTURISTIC HEATMAP ===== */
-.heatmap-outer{background:linear-gradient(135deg,rgba(0,212,255,0.03),rgba(191,90,242,0.02));border:1px solid rgba(0,212,255,0.12);border-radius:16px;padding:18px;position:relative;overflow:hidden;}
-.heatmap-outer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(0,212,255,0.5),rgba(191,90,242,0.3),transparent);}
-.heatmap-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-.heatmap-title-block{}
-.heatmap-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.heatmap-subtitle{font-size:10px;color:var(--text3);letter-spacing:1px;}
-.heatmap-stats-row{display:flex;gap:12px;flex-wrap:wrap;}
-.hm-stat{text-align:center;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 14px;}
-.hm-stat-val{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;line-height:1;}
-.hm-stat-lbl{font-size:8px;color:var(--text3);letter-spacing:1.5px;margin-top:3px;font-weight:700;text-transform:uppercase;}
-.heatmap-wrap{position:relative;overflow-x:auto;padding-bottom:4px;}
-.heatmap-wrap::-webkit-scrollbar{height:3px;}
-.heatmap-wrap::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.2);border-radius:2px;}
-.heatmap-month-labels{display:flex;gap:0;margin-bottom:5px;padding-left:32px;}
-.heatmap-month-lbl{font-size:9px;color:rgba(0,212,255,0.6);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;font-family:'Orbitron',monospace;flex-shrink:0;}
-.heatmap-day-labels{display:flex;flex-direction:column;gap:4px;position:absolute;left:0;top:0;}
-.heatmap-day-lbl{font-size:8px;color:var(--text3);letter-spacing:0.5px;font-weight:600;height:16px;display:flex;align-items:center;width:28px;}
-.heatmap-grid-wrap{padding-left:32px;}
-.heatmap{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,16px);gap:4px;}
-/* Cells */
-.hm-cell{width:16px;height:16px;border-radius:4px;transition:all 0.12s cubic-bezier(.4,0,.2,1);cursor:pointer;position:relative;}
-.hm-cell:hover{transform:scale(1.5);z-index:10;}
-.hm-cell.l0{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);}
-.hm-cell.l0:hover{border-color:rgba(0,212,255,0.4);}
-.hm-cell.l1{background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.25);box-shadow:0 0 5px rgba(0,212,255,0.08);}
-.hm-cell.l1:hover{box-shadow:0 0 10px rgba(0,212,255,0.4);}
-.hm-cell.l2{background:rgba(0,212,255,0.35);border:1px solid rgba(0,212,255,0.5);box-shadow:0 0 7px rgba(0,212,255,0.2);}
-.hm-cell.l2:hover{box-shadow:0 0 14px rgba(0,212,255,0.5);}
-.hm-cell.l3{background:rgba(0,212,255,0.6);border:1px solid rgba(0,212,255,0.8);box-shadow:0 0 9px rgba(0,212,255,0.35);}
-.hm-cell.l3:hover{box-shadow:0 0 18px rgba(0,212,255,0.6);}
-.hm-cell.l4{background:linear-gradient(135deg,#00d4ff,#bf5af2);border:1px solid rgba(0,212,255,0.9);box-shadow:0 0 12px rgba(0,212,255,0.6),0 0 24px rgba(0,212,255,0.25);animation:hm-glow-pulse 2.5s ease infinite;}
-.hm-cell.l4:hover{box-shadow:0 0 20px rgba(0,212,255,0.9),0 0 40px rgba(191,90,242,0.5);}
-/* Habit heatmap uses orange-red gradient */
-.hm-habit .hm-cell.l1{background:rgba(255,159,10,0.18);border-color:rgba(255,159,10,0.3);}
-.hm-habit .hm-cell.l2{background:rgba(255,159,10,0.4);border-color:rgba(255,159,10,0.6);}
-.hm-habit .hm-cell.l3{background:rgba(255,55,95,0.55);border-color:rgba(255,55,95,0.8);}
-.hm-habit .hm-cell.l4{background:linear-gradient(135deg,#ff9f0a,#ff375f);border-color:rgba(255,55,95,0.9);box-shadow:0 0 12px rgba(255,159,10,0.6),0 0 24px rgba(255,55,95,0.3);animation:hm-fire-pulse 2.5s ease infinite;}
-.hm-cell.today{outline:2px solid var(--gold);outline-offset:1px;box-shadow:0 0 12px rgba(255,214,10,0.6)!important;}
-.hm-cell.future{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.03);cursor:default;opacity:0.4;}
-.hm-cell.streak-fire::after{content:'';position:absolute;top:-3px;right:-3px;width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 4px var(--orange);animation:hm-glow-pulse 1.5s ease infinite;}
-/* Week separator line */
-.hm-week-sep{width:1px;background:rgba(0,212,255,0.08);margin:0 1px;grid-row:span 7;}
+.heatmap-outer{background:linear-gradient(135deg,rgba(0,212,255,0.04),rgba(191,90,242,0.02));border:1px solid rgba(0,212,255,0.18);border-radius:20px;padding:22px;position:relative;overflow:hidden;margin-top:14px;}
+.heatmap-outer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,rgba(0,212,255,0.7),rgba(191,90,242,0.5),transparent);}
+.heatmap-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:14px;}
+.heatmap-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--cyan);letter-spacing:3px;margin-bottom:5px;}
+.heatmap-subtitle{font-size:10px;color:var(--text3);letter-spacing:1.5px;}
+.heatmap-stats-row{display:flex;gap:10px;flex-wrap:wrap;}
+.hm-stat{text-align:center;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 18px;min-width:80px;transition:border-color 0.2s;}
+.hm-stat:hover{border-color:rgba(0,212,255,0.3);}
+.hm-stat-val{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;line-height:1;}
+.hm-stat-lbl{font-size:8px;color:var(--text3);letter-spacing:1.5px;margin-top:5px;font-weight:700;text-transform:uppercase;}
+/* Nav bar */
+.hm-nav-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.hm-nav-btn{background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.22);color:var(--cyan);border-radius:8px;padding:6px 14px;font-size:11px;font-family:'Orbitron',monospace;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;user-select:none;}
+.hm-nav-btn:hover{background:rgba(0,212,255,0.18);box-shadow:0 0 14px rgba(0,212,255,0.25);}
+.hm-nav-btn:active{transform:scale(0.95);}
+.hm-nav-range{font-family:'Orbitron',monospace;font-size:11px;color:var(--text2);letter-spacing:1px;flex:1;text-align:center;}
+.hm-view-tabs{display:flex;gap:3px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:9px;padding:3px;}
+.hm-view-tab{padding:5px 12px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;color:var(--text3);letter-spacing:1px;transition:all 0.2s;font-family:'Orbitron',monospace;user-select:none;}
+.hm-view-tab.active{background:rgba(0,212,255,0.2);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,0.2);}
+/* Grid */
+.hm-grid-wrap{overflow-x:auto;overflow-y:visible;padding-bottom:4px;}
+.hm-grid-wrap::-webkit-scrollbar{height:4px;}
+.hm-grid-wrap::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.3);border-radius:2px;}
+.hm-grid-inner{display:inline-flex;gap:0;align-items:flex-start;}
+.hm-day-labels{display:flex;flex-direction:column;gap:4px;padding-top:22px;margin-right:8px;flex-shrink:0;}
+.hm-day-lbl{font-size:9px;font-weight:700;height:28px;line-height:28px;width:28px;text-align:right;letter-spacing:0.5px;color:transparent;}
+.hm-day-lbl.show{color:rgba(0,212,255,0.55);}
+.hm-weeks{display:flex;gap:5px;}
+.hm-week{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.hm-month-lbl{font-size:8px;font-family:'Orbitron',monospace;color:rgba(0,212,255,0.6);letter-spacing:1.5px;height:18px;line-height:18px;white-space:nowrap;font-weight:700;}
+.hm-month-lbl.blank{visibility:hidden;}
+/* THE CELLS — nice and big */
+.hm-cell{width:28px;height:28px;border-radius:6px;cursor:pointer;position:relative;flex-shrink:0;transition:transform 0.1s,box-shadow 0.15s,outline 0.1s;}
+.hm-cell:not(.future):hover{transform:scale(1.3);z-index:30;}
+.hm-cell.l0{background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.08);}
+.hm-cell.l0:hover{background:rgba(0,212,255,0.08);border-color:rgba(0,212,255,0.4);}
+.hm-cell.l1{background:rgba(0,212,255,0.18);border:1px solid rgba(0,212,255,0.32);box-shadow:0 0 6px rgba(0,212,255,0.12);}
+.hm-cell.l1:hover{box-shadow:0 0 14px rgba(0,212,255,0.5);}
+.hm-cell.l2{background:rgba(0,212,255,0.38);border:1px solid rgba(0,212,255,0.55);box-shadow:0 0 8px rgba(0,212,255,0.25);}
+.hm-cell.l2:hover{box-shadow:0 0 18px rgba(0,212,255,0.6);}
+.hm-cell.l3{background:rgba(0,212,255,0.65);border:1px solid rgba(0,212,255,0.88);box-shadow:0 0 12px rgba(0,212,255,0.45);}
+.hm-cell.l3:hover{box-shadow:0 0 22px rgba(0,212,255,0.75);}
+.hm-cell.l4{background:linear-gradient(135deg,#00d4ff,#bf5af2);border:1px solid rgba(0,212,255,0.95);box-shadow:0 0 16px rgba(0,212,255,0.7),0 0 32px rgba(0,212,255,0.25);animation:hm-pulse 2.5s ease infinite;}
+.hm-cell.l4:hover{box-shadow:0 0 28px rgba(0,212,255,1),0 0 56px rgba(191,90,242,0.6);}
+.hm-cell.today{outline:2px solid var(--gold)!important;outline-offset:2px;box-shadow:0 0 16px rgba(255,214,10,0.7)!important;}
+.hm-cell.selected{outline:2px solid white!important;outline-offset:2px!important;z-index:10;}
+.hm-cell.future{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);cursor:default;opacity:0.25;}
+/* Habit orange theme */
+.hm-habit .hm-cell.l1{background:rgba(255,159,10,0.2);border-color:rgba(255,159,10,0.35);}
+.hm-habit .hm-cell.l2{background:rgba(255,159,10,0.42);border-color:rgba(255,159,10,0.6);}
+.hm-habit .hm-cell.l3{background:rgba(255,55,95,0.58);border-color:rgba(255,55,95,0.85);}
+.hm-habit .hm-cell.l4{background:linear-gradient(135deg,#ff9f0a,#ff375f);border-color:rgba(255,55,95,0.95);box-shadow:0 0 16px rgba(255,159,10,0.7),0 0 32px rgba(255,55,95,0.3);animation:hm-fire 2.5s ease infinite;}
+/* Detail panel (click a cell) */
+.hm-detail{background:rgba(0,0,0,0.45);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:18px;margin-top:18px;display:none;animation:fadeUp 0.2s ease;}
+.hm-detail.open{display:block;}
+.hm-detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.hm-detail-datelbl{font-family:'Orbitron',monospace;font-size:12px;color:var(--cyan);letter-spacing:2px;font-weight:700;}
+.hm-detail-badge{font-size:10px;padding:3px 10px;border-radius:6px;font-weight:700;letter-spacing:1px;}
+.hm-detail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.hm-ds{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px;text-align:center;}
+.hm-ds-val{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;line-height:1;}
+.hm-ds-lbl{font-size:8px;color:var(--text3);letter-spacing:1.5px;margin-top:5px;font-weight:700;text-transform:uppercase;}
+.hm-detail-bar-row{display:flex;align-items:center;gap:12px;}
+.hm-detail-bar-lbl{font-size:10px;color:var(--text2);white-space:nowrap;min-width:80px;}
+.hm-detail-bar{flex:1;height:10px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden;}
+.hm-detail-bar-fill{height:100%;border-radius:5px;transition:width 0.5s ease;background:linear-gradient(to right,var(--cyan),var(--purple));}
+.hm-detail-close{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:0 4px;line-height:1;}
+.hm-detail-close:hover{color:var(--text);}
 /* Legend */
-.hm-legend{display:flex;align-items:center;gap:7px;margin-top:12px;justify-content:space-between;flex-wrap:wrap;}
-.hm-legend-left{font-size:9px;color:var(--text3);letter-spacing:1px;display:flex;align-items:center;gap:4px;}
-.hm-legend-right{display:flex;align-items:center;gap:5px;}
+.hm-legend{display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:space-between;flex-wrap:wrap;}
+.hm-legend-left{font-size:9px;color:var(--text3);letter-spacing:1px;font-family:'Orbitron',monospace;}
+.hm-legend-right{display:flex;align-items:center;gap:6px;}
 .hm-legend-lbl{font-size:9px;color:var(--text3);letter-spacing:1px;}
-.hm-legend-cell{width:13px;height:13px;border-radius:3px;border:1px solid rgba(255,255,255,0.08);}
+.hm-legend-cell{width:16px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,0.08);}
+/* Scanline overlay */
+.hm-scanline{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(0,212,255,0.012) 31px,rgba(0,212,255,0.012) 32px);pointer-events:none;border-radius:20px;}
 /* Tooltip */
-.hm-tooltip{position:fixed;background:rgba(2,4,14,0.97);border:1px solid rgba(0,212,255,0.35);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text);pointer-events:none;z-index:9999;display:none;backdrop-filter:blur(16px);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 20px rgba(0,212,255,0.1);min-width:160px;}
-.hm-tooltip::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--cyan),transparent);}
-.hm-tooltip-date{font-family:'Orbitron',monospace;font-size:9px;color:var(--cyan);letter-spacing:1.5px;margin-bottom:6px;text-transform:uppercase;}
-.hm-tooltip-val{font-weight:700;color:var(--text);font-size:12px;}
-.hm-tooltip-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:6px;overflow:hidden;}
-.hm-tooltip-bar-fill{height:100%;border-radius:2px;background:linear-gradient(to right,var(--cyan),var(--purple));transition:width 0.3s;}
-/* Scanline */
-.heatmap-scanline{position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 19px,rgba(0,212,255,0.015) 19px,rgba(0,212,255,0.015) 20px);pointer-events:none;border-radius:12px;}
-@keyframes hm-glow-pulse{0%,100%{box-shadow:0 0 8px rgba(0,212,255,0.5),0 0 16px rgba(0,212,255,0.2);}50%{box-shadow:0 0 18px rgba(0,212,255,0.9),0 0 36px rgba(191,90,242,0.4);}}
-@keyframes hm-fire-pulse{0%,100%{box-shadow:0 0 8px rgba(255,159,10,0.6),0 0 16px rgba(255,55,95,0.2);}50%{box-shadow:0 0 18px rgba(255,159,10,0.9),0 0 36px rgba(255,55,95,0.5);}}
+.hm-tooltip{position:fixed;background:rgba(2,4,16,0.97);border:1px solid rgba(0,212,255,0.4);border-radius:14px;padding:13px 17px;pointer-events:none;z-index:9999;display:none;backdrop-filter:blur(20px);min-width:190px;box-shadow:0 10px 40px rgba(0,0,0,0.7),0 0 24px rgba(0,212,255,0.1);}
+.hm-tooltip::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(to right,transparent,rgba(0,212,255,0.8),transparent);}
+.hm-tt-date{font-family:'Orbitron',monospace;font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;}
+.hm-tt-val{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.5;}
+.hm-tt-sub{font-size:10px;color:var(--text2);}
+.hm-tt-bar{height:5px;background:rgba(255,255,255,0.07);border-radius:3px;margin-top:9px;overflow:hidden;}
+.hm-tt-bar-fill{height:100%;border-radius:3px;background:linear-gradient(to right,var(--cyan),var(--purple));transition:width 0.3s;}
+@keyframes hm-pulse{0%,100%{box-shadow:0 0 10px rgba(0,212,255,0.55),0 0 22px rgba(0,212,255,0.2);}50%{box-shadow:0 0 22px rgba(0,212,255,1),0 0 44px rgba(191,90,242,0.5);}}
+@keyframes hm-fire{0%,100%{box-shadow:0 0 10px rgba(255,159,10,0.6),0 0 22px rgba(255,55,95,0.2);}50%{box-shadow:0 0 22px rgba(255,159,10,1),0 0 44px rgba(255,55,95,0.55);}}
+
+/* ===== HEATMAP MODAL ===== */
+#hm-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);z-index:1000;display:none;align-items:center;justify-content:center;padding:12px;}
+#hm-modal-overlay.open{display:flex;animation:fadeIn 0.2s ease;}
+#hm-modal{background:linear-gradient(160deg,rgba(3,6,20,0.99),rgba(6,12,35,0.99));border:1px solid rgba(0,212,255,0.25);border-radius:24px;width:100%;max-width:900px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 0 80px rgba(0,212,255,0.1),0 30px 60px rgba(0,0,0,0.8);}
+#hm-modal::-webkit-scrollbar{width:4px;}
+#hm-modal::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.2);border-radius:2px;}
+#hm-modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,#00d4ff,#bf5af2,transparent);border-radius:24px 24px 0 0;}
+.hm-modal-header{display:flex;align-items:center;justify-content:space-between;padding:22px 24px 0;flex-wrap:wrap;gap:12px;}
+.hm-modal-title{font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:var(--cyan);letter-spacing:3px;}
+.hm-modal-close{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--text2);width:36px;height:36px;border-radius:10px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;}
+.hm-modal-close:hover{background:rgba(255,55,95,0.15);border-color:rgba(255,55,95,0.4);color:var(--red);}
+.hm-modal-body{padding:20px 24px 24px;}
+/* Day detail inside modal */
+#hm-modal-day-detail{background:rgba(0,0,0,0.5);border:1px solid rgba(0,212,255,0.15);border-radius:16px;padding:20px;margin-top:20px;display:none;}
+#hm-modal-day-detail.open{display:block;animation:fadeUp 0.2s ease;}
+.hm-modal-day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.hm-modal-day-date{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--cyan);letter-spacing:2px;}
+.hm-modal-day-badge{font-size:11px;padding:4px 12px;border-radius:8px;font-weight:700;letter-spacing:1px;}
+.hm-modal-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:500px){.hm-modal-stats{grid-template-columns:repeat(2,1fr);}}
+.hm-ms{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 12px;text-align:center;}
+.hm-ms-val{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;line-height:1;}
+.hm-ms-lbl{font-size:9px;color:var(--text3);letter-spacing:2px;margin-top:5px;font-weight:700;text-transform:uppercase;}
+.hm-modal-bar-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.hm-modal-bar{flex:1;height:12px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;}
+.hm-modal-bar-fill{height:100%;border-radius:6px;background:linear-gradient(to right,var(--cyan),var(--purple));transition:width 0.6s ease;}
+/* Task list in modal */
+.hm-task-list{display:flex;flex-direction:column;gap:7px;}
+.hm-task-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:10px;transition:border-color 0.2s;}
+.hm-task-row.done{opacity:0.55;}
+.hm-task-row:hover{border-color:rgba(0,212,255,0.2);}
+.hm-task-check{width:20px;height:20px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;}
+.hm-task-check.done{background:var(--green);color:white;box-shadow:0 0 8px rgba(48,209,88,0.5);}
+.hm-task-check.undone{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:transparent;}
+.hm-task-title{flex:1;font-size:13px;font-weight:600;}
+.hm-task-title.done{text-decoration:line-through;color:var(--text2);}
+.hm-task-rank{font-size:9px;font-weight:900;padding:2px 8px;border-radius:5px;letter-spacing:1px;}
+.hm-task-time{font-size:10px;color:var(--text3);font-family:'Orbitron',monospace;}
+/* Special heatmap launcher on dashboard */
+#hm-launch-btn{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(191,90,242,0.06));border:1px solid rgba(0,212,255,0.25);border-radius:14px;padding:12px 16px;cursor:pointer;transition:all 0.25s;width:100%;text-align:left;margin-top:12px;position:relative;overflow:hidden;}
+#hm-launch-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(0,212,255,0.6),transparent);}
+#hm-launch-btn:hover{background:linear-gradient(135deg,rgba(0,212,255,0.14),rgba(191,90,242,0.1));border-color:rgba(0,212,255,0.5);box-shadow:0 0 20px rgba(0,212,255,0.15);}
+.hm-launch-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(191,90,242,0.15));border:1px solid rgba(0,212,255,0.3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 0 14px rgba(0,212,255,0.2);}
+.hm-launch-text{flex:1;}
+.hm-launch-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;margin-bottom:3px;}
+.hm-launch-sub{font-size:10px;color:var(--text3);letter-spacing:0.5px;}
+.hm-launch-arr{font-family:'Orbitron',monospace;font-size:14px;color:rgba(0,212,255,0.5);transition:transform 0.2s;}
+#hm-launch-btn:hover .hm-launch-arr{transform:translateX(4px);color:var(--cyan);}
+@keyframes hm-launch-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,0.3);}50%{box-shadow:0 0 0 8px rgba(0,212,255,0);}}
+.hm-launch-icon{animation:hm-launch-pulse 3s ease infinite;}
 
 /* ===== HABITS ===== */
 .habit-item{display:flex;align-items:center;gap:12px;padding:12px 13px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;margin-bottom:7px;transition:all 0.2s;}
@@ -1117,6 +1195,15 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
               <div class="card-title">📅 This Week</div>
               <div class="crate-bar"><div class="crate-header"><span class="crate-label">Weekly Progress</span><span class="crate-val" id="dw-pct" style="color:var(--purple)">0%</span></div><div class="crate-track"><div class="crate-fill" id="dw-fill" style="width:0%;background:linear-gradient(to right,var(--purple),var(--pink))"></div></div></div>
               <div class="crate-bar"><div class="crate-header"><span class="crate-label">Monthly Progress</span><span class="crate-val" id="dm-pct" style="color:var(--gold)">0%</span></div><div class="crate-track"><div class="crate-fill" id="dm-fill" style="width:0%;background:linear-gradient(to right,var(--gold),var(--orange))"></div></div></div>
+              <!-- Heatmap launcher -->
+              <button id="hm-launch-btn" onclick="openHeatmapModal()">
+                <div class="hm-launch-icon">⚡</div>
+                <div class="hm-launch-text">
+                  <div class="hm-launch-title">ACTIVITY MATRIX</div>
+                  <div class="hm-launch-sub">View your full activity heatmap with daily task details</div>
+                </div>
+                <div class="hm-launch-arr">▶</div>
+              </button>
             </div>
           </div>
         </div>
@@ -1149,38 +1236,80 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
                 <div style="text-align:center;padding:8px;background:rgba(191,90,242,0.05);border-radius:8px"><div style="font-size:20px;margin-bottom:3px">⏱️</div><div id="an-pomo" style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--purple)">0</div><div style="font-size:9px;color:var(--text2)">POMODOROS</div></div>
               </div>
             </div>
-            <div class="heatmap-outer" style="overflow:visible;">
-              <div class="heatmap-scanline"></div>
+            <div class="heatmap-outer" id="hm-main-outer">
+              <div class="hm-scanline"></div>
+              <!-- Header -->
               <div class="heatmap-header">
-                <div class="heatmap-title-block">
+                <div>
                   <div class="heatmap-title">⚡ ACTIVITY MATRIX</div>
-                  <div class="heatmap-subtitle">12-WEEK QUEST COMPLETION LOG</div>
+                  <div class="heatmap-subtitle" id="hm-subtitle">QUEST COMPLETION LOG</div>
                 </div>
                 <div class="heatmap-stats-row">
-                  <div class="hm-stat"><div class="hm-stat-val" id="hm-total-lbl" style="color:var(--cyan)">—</div><div class="hm-stat-lbl">Tasks Done</div></div>
-                  <div class="hm-stat"><div class="hm-stat-val" id="hm-active-days" style="color:var(--green)">—</div><div class="hm-stat-lbl">Active Days</div></div>
+                  <div class="hm-stat"><div class="hm-stat-val" id="hm-total-lbl" style="color:var(--cyan)">0</div><div class="hm-stat-lbl">Tasks Done</div></div>
+                  <div class="hm-stat"><div class="hm-stat-val" id="hm-active-days" style="color:var(--green)">0</div><div class="hm-stat-lbl">Active Days</div></div>
                   <div class="hm-stat"><div class="hm-stat-val" id="hm-best-pct" style="color:var(--gold)">—</div><div class="hm-stat-lbl">Best Day</div></div>
+                  <div class="hm-stat"><div class="hm-stat-val" id="hm-cur-streak" style="color:var(--orange)">0</div><div class="hm-stat-lbl">Streak 🔥</div></div>
                 </div>
               </div>
-              <div class="heatmap-wrap" style="position:relative;">
-                <div id="hm-month-labels" class="heatmap-month-labels"></div>
-                <div style="position:relative;">
-                  <div id="hm-day-labels" class="heatmap-day-labels"></div>
-                  <div class="heatmap-grid-wrap">
-                    <div class="heatmap" id="p-heatmap"></div>
+              <!-- Nav bar -->
+              <div class="hm-nav-bar">
+                <button class="hm-nav-btn" onclick="hmNav(-1)">◀ PREV</button>
+                <span class="hm-nav-range" id="hm-nav-range">—</span>
+                <button class="hm-nav-btn" onclick="hmNav(1)">NEXT ▶</button>
+                <button class="hm-nav-btn" onclick="hmGoToday()" style="border-color:var(--gold);color:var(--gold);">⊙ TODAY</button>
+                <div class="hm-view-tabs">
+                  <div class="hm-view-tab active" id="hmtab-12w" onclick="hmSetView('12w',this)">12W</div>
+                  <div class="hm-view-tab" id="hmtab-6m" onclick="hmSetView('6m',this)">6M</div>
+                  <div class="hm-view-tab" id="hmtab-1y" onclick="hmSetView('1y',this)">1Y</div>
+                </div>
+              </div>
+              <!-- Grid -->
+              <div class="hm-grid-wrap">
+                <div class="hm-grid-inner">
+                  <div class="hm-day-labels" id="hm-day-labels">
+                    <div class="hm-day-lbl">S</div>
+                    <div class="hm-day-lbl show">MON</div>
+                    <div class="hm-day-lbl">T</div>
+                    <div class="hm-day-lbl show">WED</div>
+                    <div class="hm-day-lbl">T</div>
+                    <div class="hm-day-lbl show">FRI</div>
+                    <div class="hm-day-lbl">S</div>
+                  </div>
+                  <div class="hm-weeks" id="p-heatmap"></div>
+                </div>
+              </div>
+              <!-- Legend -->
+              <div class="hm-legend">
+                <div class="hm-legend-left">⚡ INTENSITY</div>
+                <div class="hm-legend-right">
+                  <span class="hm-legend-lbl">NONE</span>
+                  <div class="hm-legend-cell" style="background:rgba(255,255,255,0.045);"></div>
+                  <div class="hm-legend-cell" style="background:rgba(0,212,255,0.2);box-shadow:0 0 5px rgba(0,212,255,0.15);"></div>
+                  <div class="hm-legend-cell" style="background:rgba(0,212,255,0.42);box-shadow:0 0 7px rgba(0,212,255,0.25);"></div>
+                  <div class="hm-legend-cell" style="background:rgba(0,212,255,0.7);box-shadow:0 0 10px rgba(0,212,255,0.45);"></div>
+                  <div class="hm-legend-cell" style="background:linear-gradient(135deg,#00d4ff,#bf5af2);box-shadow:0 0 14px rgba(0,212,255,0.7);"></div>
+                  <span class="hm-legend-lbl">MAX</span>
+                </div>
+              </div>
+              <!-- Click-to-expand day detail panel -->
+              <div class="hm-detail" id="hm-detail">
+                <div class="hm-detail-head">
+                  <div class="hm-detail-datelbl" id="hm-detail-date">—</div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="hm-detail-badge" id="hm-detail-badge"></div>
+                    <button class="hm-detail-close" onclick="document.getElementById('hm-detail').classList.remove('open');document.querySelectorAll('.hm-cell.selected').forEach(c=>c.classList.remove('selected'))">✕</button>
                   </div>
                 </div>
-                <div class="hm-legend">
-                  <div class="hm-legend-left">⚡ INTENSITY</div>
-                  <div class="hm-legend-right">
-                    <span class="hm-legend-lbl">NONE</span>
-                    <div class="hm-legend-cell" style="background:rgba(255,255,255,0.04);"></div>
-                    <div class="hm-legend-cell" style="background:rgba(0,212,255,0.15);box-shadow:0 0 4px rgba(0,212,255,0.1);"></div>
-                    <div class="hm-legend-cell" style="background:rgba(0,212,255,0.35);box-shadow:0 0 6px rgba(0,212,255,0.2);"></div>
-                    <div class="hm-legend-cell" style="background:rgba(0,212,255,0.6);box-shadow:0 0 8px rgba(0,212,255,0.35);"></div>
-                    <div class="hm-legend-cell" style="background:linear-gradient(135deg,#00d4ff,#bf5af2);box-shadow:0 0 10px rgba(0,212,255,0.6);"></div>
-                    <span class="hm-legend-lbl">MAX</span>
-                  </div>
+                <div class="hm-detail-stats">
+                  <div class="hm-ds"><div class="hm-ds-val" id="hm-dd-done" style="color:var(--cyan)">—</div><div class="hm-ds-lbl">Completed</div></div>
+                  <div class="hm-ds"><div class="hm-ds-val" id="hm-dd-total" style="color:var(--text2)">—</div><div class="hm-ds-lbl">Total Tasks</div></div>
+                  <div class="hm-ds"><div class="hm-ds-val" id="hm-dd-pct" style="color:var(--gold)">—</div><div class="hm-ds-lbl">Rate</div></div>
+                  <div class="hm-ds"><div class="hm-ds-val" id="hm-dd-streak" style="color:var(--orange)">—</div><div class="hm-ds-lbl">Day Streak</div></div>
+                </div>
+                <div class="hm-detail-bar-row">
+                  <div class="hm-detail-bar-lbl">Completion Rate</div>
+                  <div class="hm-detail-bar"><div class="hm-detail-bar-fill" id="hm-dd-bar" style="width:0%"></div></div>
+                  <div style="font-size:11px;color:var(--cyan);font-weight:700;min-width:36px;text-align:right;" id="hm-dd-bar-pct">0%</div>
                 </div>
               </div>
             </div>
@@ -1396,38 +1525,70 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 
         <div id="habits-list"></div>
 
-        <div class="heatmap-outer" style="margin-top:14px;overflow:visible;">
-          <div class="heatmap-scanline"></div>
+        <div class="heatmap-outer" id="hm-habit-outer">
+          <div class="hm-scanline"></div>
           <div class="heatmap-header">
-            <div class="heatmap-title-block">
+            <div>
               <div class="heatmap-title" style="color:var(--orange);">🔥 HABIT FIRE MATRIX</div>
-              <div class="heatmap-subtitle">12-WEEK HABIT COMPLETION LOG</div>
+              <div class="heatmap-subtitle" id="hm-habit-subtitle">12-WEEK HABIT LOG</div>
             </div>
             <div class="heatmap-stats-row">
-              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-total-lbl" style="color:var(--orange)">—</div><div class="hm-stat-lbl">Habits Done</div></div>
-              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-active-days" style="color:var(--green)">—</div><div class="hm-stat-lbl">Active Days</div></div>
-              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-streak" style="color:var(--red)">—</div><div class="hm-stat-lbl">Best Streak</div></div>
+              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-total-lbl" style="color:var(--orange)">0</div><div class="hm-stat-lbl">Habits Done</div></div>
+              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-active-days" style="color:var(--green)">0</div><div class="hm-stat-lbl">Active Days</div></div>
+              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-streak" style="color:var(--red)">0</div><div class="hm-stat-lbl">Best Streak</div></div>
             </div>
           </div>
-          <div class="heatmap-wrap" style="position:relative;">
-            <div id="hm-habit-month-labels" class="heatmap-month-labels"></div>
-            <div style="position:relative;">
-              <div id="hm-habit-day-labels" class="heatmap-day-labels"></div>
-              <div class="heatmap-grid-wrap">
-                <div class="heatmap hm-habit" id="habit-heatmap"></div>
-              </div>
+          <div class="hm-nav-bar">
+            <button class="hm-nav-btn" style="border-color:rgba(255,159,10,0.3);color:var(--orange);" onclick="hmHabitNav(-1)">◀ PREV</button>
+            <span class="hm-nav-range" id="hm-habit-nav-range">—</span>
+            <button class="hm-nav-btn" style="border-color:rgba(255,159,10,0.3);color:var(--orange);" onclick="hmHabitNav(1)">NEXT ▶</button>
+            <button class="hm-nav-btn" onclick="hmHabitGoToday()" style="border-color:var(--gold);color:var(--gold);">⊙ TODAY</button>
+            <div class="hm-view-tabs">
+              <div class="hm-view-tab active" id="hmhtab-12w" onclick="hmHabitSetView('12w',this)">12W</div>
+              <div class="hm-view-tab" id="hmhtab-6m" onclick="hmHabitSetView('6m',this)">6M</div>
+              <div class="hm-view-tab" id="hmhtab-1y" onclick="hmHabitSetView('1y',this)">1Y</div>
             </div>
-            <div class="hm-legend">
-              <div class="hm-legend-left">🔥 FIRE LEVEL</div>
-              <div class="hm-legend-right">
-                <span class="hm-legend-lbl">COLD</span>
-                <div class="hm-legend-cell" style="background:rgba(255,255,255,0.04);"></div>
-                <div class="hm-legend-cell" style="background:rgba(255,159,10,0.18);"></div>
-                <div class="hm-legend-cell" style="background:rgba(255,159,10,0.4);"></div>
-                <div class="hm-legend-cell" style="background:rgba(255,55,95,0.55);"></div>
-                <div class="hm-legend-cell" style="background:linear-gradient(135deg,#ff9f0a,#ff375f);box-shadow:0 0 8px rgba(255,159,10,0.5);"></div>
-                <span class="hm-legend-lbl">🔥 MAX</span>
+          </div>
+          <div class="hm-grid-wrap">
+            <div class="hm-grid-inner">
+              <div class="hm-day-labels">
+                <div class="hm-day-lbl">S</div>
+                <div class="hm-day-lbl show">MON</div>
+                <div class="hm-day-lbl">T</div>
+                <div class="hm-day-lbl show">WED</div>
+                <div class="hm-day-lbl">T</div>
+                <div class="hm-day-lbl show">FRI</div>
+                <div class="hm-day-lbl">S</div>
               </div>
+              <div class="hm-weeks hm-habit" id="habit-heatmap"></div>
+            </div>
+          </div>
+          <div class="hm-legend">
+            <div class="hm-legend-left">🔥 FIRE LEVEL</div>
+            <div class="hm-legend-right">
+              <span class="hm-legend-lbl">COLD</span>
+              <div class="hm-legend-cell" style="background:rgba(255,255,255,0.04);"></div>
+              <div class="hm-legend-cell" style="background:rgba(255,159,10,0.22);"></div>
+              <div class="hm-legend-cell" style="background:rgba(255,159,10,0.45);"></div>
+              <div class="hm-legend-cell" style="background:rgba(255,55,95,0.6);"></div>
+              <div class="hm-legend-cell" style="background:linear-gradient(135deg,#ff9f0a,#ff375f);box-shadow:0 0 10px rgba(255,159,10,0.6);"></div>
+              <span class="hm-legend-lbl">🔥 MAX</span>
+            </div>
+          </div>
+          <div class="hm-detail" id="hm-habit-detail">
+            <div class="hm-detail-head">
+              <div class="hm-detail-datelbl" id="hm-hd-date">—</div>
+              <button class="hm-detail-close" onclick="document.getElementById('hm-habit-detail').classList.remove('open');document.querySelectorAll('.hm-cell.selected').forEach(c=>c.classList.remove('selected'))">✕</button>
+            </div>
+            <div class="hm-detail-stats" style="grid-template-columns:repeat(3,1fr);">
+              <div class="hm-ds"><div class="hm-ds-val" id="hm-hd-done" style="color:var(--orange)">—</div><div class="hm-ds-lbl">Habits Done</div></div>
+              <div class="hm-ds"><div class="hm-ds-val" id="hm-hd-total" style="color:var(--text2)">—</div><div class="hm-ds-lbl">Total Habits</div></div>
+              <div class="hm-ds"><div class="hm-ds-val" id="hm-hd-pct" style="color:var(--gold)">—</div><div class="hm-ds-lbl">Rate</div></div>
+            </div>
+            <div class="hm-detail-bar-row">
+              <div class="hm-detail-bar-lbl">Completion</div>
+              <div class="hm-detail-bar"><div class="hm-detail-bar-fill" id="hm-hd-bar" style="width:0%;background:linear-gradient(to right,var(--orange),var(--red));"></div></div>
+              <div style="font-size:11px;color:var(--orange);font-weight:700;min-width:36px;text-align:right;" id="hm-hd-bar-pct">0%</div>
             </div>
           </div>
         </div>
@@ -2266,9 +2427,15 @@ function save(){
   try{
     const today=todayStr();
     D.stats.activityMap=D.stats.activityMap||{};
-    const doneCt=D.tasks.daily.filter(t=>t.done).length;
+    const doneTasks=D.tasks.daily.filter(t=>t.done);
+    const doneCt=doneTasks.length;
     const totalCt=D.tasks.daily.length;
-    D.stats.activityMap[today]={done:doneCt,total:totalCt};
+    // Store full task snapshot: done count, total, and list of completed task titles
+    D.stats.activityMap[today]={
+      done:doneCt,
+      total:totalCt,
+      tasks: D.tasks.daily.map(t=>({title:t.title,done:t.done,rank:t.rank,cat:t.cat,time:t.time||null}))
+    };
     // Keep habitActivityMap total count current
     D.stats.habitActivityMap=D.stats.habitActivityMap||{};
     if(D.stats.habitActivityMap[today]){
@@ -2656,156 +2823,439 @@ function updateAvatarUI(){
   else{tbAv.textContent=av;tbAv.style.fontSize='18px';}
 }
 
-// ===== FUTURISTIC HEATMAP RENDERER =====
-function buildHeatmap(containerId, monthLblId, dayLblId, totalLblId, mode='tasks'){
-  const WEEKS = 16; // show more history
-  const DAYS = 7;
+// ===== HEATMAP ENGINE =====
+const HM = {
+  weekOffset: 0, view: '12w',
+  habitWeekOffset: 0, habitView: '12w',
+  modalWeekOffset: 0, modalView: '12w',
+};
+
+function hmWeeksForView(v){ return v==='1y'?52:v==='6m'?26:12; }
+
+function hmNav(dir){
+  const weeks = hmWeeksForView(HM.view);
+  HM.weekOffset = Math.max(0, HM.weekOffset + dir * weeks);
+  renderHeatmap('p-heatmap','tasks');
+}
+function hmGoToday(){ HM.weekOffset=0; renderHeatmap('p-heatmap','tasks'); }
+function hmSetView(v, el){
+  HM.view=v; HM.weekOffset=0;
+  document.querySelectorAll('#hm-main-outer .hm-view-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderHeatmap('p-heatmap','tasks');
+}
+function hmHabitNav(dir){
+  const weeks = hmWeeksForView(HM.habitView);
+  HM.habitWeekOffset = Math.max(0, HM.habitWeekOffset + dir * weeks);
+  renderHeatmap('habit-heatmap','habits');
+}
+function hmHabitGoToday(){ HM.habitWeekOffset=0; renderHeatmap('habit-heatmap','habits'); }
+function hmHabitSetView(v, el){
+  HM.habitView=v; HM.habitWeekOffset=0;
+  document.querySelectorAll('#hm-habit-outer .hm-view-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderHeatmap('habit-heatmap','habits');
+}
+
+function renderHeatmap(containerId, mode){
+  const isHabit = mode==='habits';
+  const view    = isHabit ? HM.habitView    : HM.view;
+  const offset  = isHabit ? HM.habitWeekOffset : HM.weekOffset;
+  const WEEKS   = hmWeeksForView(view);
+
   const today = new Date(); today.setHours(0,0,0,0);
-  const todayStr_ = today.toISOString().split('T')[0];
+  const todayStr = today.toISOString().split('T')[0];
+  const actMap = isHabit ? (D.stats.habitActivityMap||{}) : (D.stats.activityMap||{});
 
-  // Pick data source
-  const actMap = mode==='habits'
-    ? (D.stats.habitActivityMap || {})
-    : (D.stats.activityMap || {});
+  // Build grid: ends on Saturday of the current week minus offset*WEEKS weeks
+  // Column = week (left=oldest, right=newest), Row = day (0=Sun..6=Sat)
+  const todayDow = today.getDay(); // 0=Sun
+  // The "anchor" Saturday for this view
+  const anchorEnd = new Date(today);
+  anchorEnd.setDate(today.getDate() - todayDow + 6 - offset * WEEKS * 7);
+  const anchorStart = new Date(anchorEnd);
+  anchorStart.setDate(anchorEnd.getDate() - WEEKS*7 + 1);
 
-  // Build max value for scaling
-  const allVals = Object.values(actMap).map(v => mode==='habits' ? (v.done||0) : (v.done||0));
-  const maxVal = Math.max(...allVals, 1);
-
-  // Build grid starting from Sunday WEEKS weeks ago
-  const todayDow = today.getDay();
-  const gridStart = new Date(today);
-  gridStart.setDate(today.getDate() - todayDow - (WEEKS - 1) * 7);
-
+  // Build flat cell array col-major (week columns, 7 rows each)
   const cells = [];
-  for(let i = 0; i < WEEKS * DAYS; i++){
-    const d = new Date(gridStart);
-    d.setDate(gridStart.getDate() + i);
-    const ds = d.toISOString().split('T')[0];
-    const entry = actMap[ds] || null;
-    const isFuture = d > today;
-    const isToday = ds === todayStr_;
-    cells.push({ date: d, ds, entry, isFuture, isToday, weekIdx: Math.floor(i/7), dow: i%7 });
-  }
-
-  // Detect consecutive active days for streak fire dots
-  const activeDays = new Set(cells.filter(c=>c.entry&&(c.entry.done||0)>0).map(c=>c.ds));
-  function isStreakCell(ds){
-    const prev = new Date(ds); prev.setDate(prev.getDate()-1);
-    const next = new Date(ds); next.setDate(next.getDate()+1);
-    return activeDays.has(prev.toISOString().split('T')[0]) || activeDays.has(next.toISOString().split('T')[0]);
-  }
-
-  // Month labels
-  const monthEl = document.getElementById(monthLblId);
-  if(monthEl){
-    const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    let html = '', lastMonth = -1;
-    for(let w = 0; w < WEEKS; w++){
-      const cellDate = cells[w * DAYS].date;
-      const m = cellDate.getMonth();
-      if(m !== lastMonth){ html += `<span class="heatmap-month-lbl" style="width:20px;">${MONTH_NAMES[m]}</span>`; lastMonth = m; }
-      else { html += `<span style="display:inline-block;width:20px;"></span>`; }
+  for(let w=0; w<WEEKS; w++){
+    for(let d=0; d<7; d++){
+      const date = new Date(anchorStart);
+      date.setDate(anchorStart.getDate() + w*7 + d);
+      const ds = date.toISOString().split('T')[0];
+      cells.push({ date, ds, w, d,
+        entry: actMap[ds]||null,
+        isFuture: date > today,
+        isToday: ds===todayStr });
     }
-    monthEl.innerHTML = html;
   }
 
-  // Day labels
-  const dayLblEl = document.getElementById(dayLblId);
-  if(dayLblEl){
-    const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-    dayLblEl.innerHTML = DAY_NAMES.map((d,i)=>
-      `<div class="heatmap-day-lbl" style="visibility:${i%2===1?'visible':'hidden'}">${d}</div>`
-    ).join('');
+  // Stats
+  const allVals = cells.filter(c=>!c.isFuture&&c.entry).map(c=>c.entry.done||0);
+  const maxVal = Math.max(...allVals, 1);
+  let totalDone=0, activeDayCount=0, bestPct=0;
+  cells.forEach(c=>{ if(!c.isFuture&&c.entry&&(c.entry.done||0)>0){ totalDone+=c.entry.done; activeDayCount++; const p=c.entry.total>0?Math.round(c.entry.done/c.entry.total*100):0; if(p>bestPct)bestPct=p; }});
+
+  // Build consecutive-streak data
+  const activeDaySet = new Set(cells.filter(c=>!c.isFuture&&(c.entry?.done||0)>0).map(c=>c.ds));
+  function streakAt(ds){
+    // count backward streak including this day
+    let s=0, cur=new Date(ds);
+    while(activeDaySet.has(cur.toISOString().split('T')[0])){ s++; cur.setDate(cur.getDate()-1); }
+    return s;
   }
 
-  // Build grid
+  // Range label
+  const MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const startLbl=`${MONTH_NAMES[anchorStart.getMonth()]} ${anchorStart.getDate()}, ${anchorStart.getFullYear()}`;
+  const endLbl  =`${MONTH_NAMES[anchorEnd.getMonth()]} ${anchorEnd.getDate()}, ${anchorEnd.getFullYear()}`;
+  const rangeId = isHabit ? 'hm-habit-nav-range' : 'hm-nav-range';
+  const el = document.getElementById(rangeId); if(el) el.textContent=`${startLbl} — ${endLbl}`;
+
+  // Update stat boxes
+  if(!isHabit){
+    const s=id=>document.getElementById(id);
+    if(s('hm-total-lbl'))    s('hm-total-lbl').textContent    = totalDone;
+    if(s('hm-active-days'))  s('hm-active-days').textContent  = activeDayCount;
+    if(s('hm-best-pct'))     s('hm-best-pct').textContent     = bestPct ? bestPct+'%' : '—';
+    if(s('hm-cur-streak'))   s('hm-cur-streak').textContent   = D.stats.streak||0;
+  } else {
+    const s=id=>document.getElementById(id);
+    if(s('hm-habit-total-lbl'))   s('hm-habit-total-lbl').textContent   = totalDone;
+    if(s('hm-habit-active-days')) s('hm-habit-active-days').textContent = activeDayCount;
+    if(s('hm-habit-streak'))      s('hm-habit-streak').textContent      = D.stats.bestStreak||0;
+  }
+
+  // Render grid
   const container = document.getElementById(containerId);
   if(!container) return;
-  container.innerHTML = '';
+  container.innerHTML='';
 
-  let totalDone = 0, activeDayCount = 0, bestDayPct = 0;
+  for(let w=0; w<WEEKS; w++){
+    const weekCells = cells.slice(w*7, w*7+7);
+    const weekDiv = document.createElement('div');
+    weekDiv.className='hm-week';
 
-  cells.forEach((cell, idx) => {
-    const div = document.createElement('div');
-    let level = 'l0', doneCt = 0, totalCt = 0, pctVal = 0;
+    // Month label on top
+    const monthLbl = document.createElement('div');
+    const firstInWeek = weekCells[0].date;
+    const showMonth = (w===0) || (firstInWeek.getDate()<=7);
+    monthLbl.className = 'hm-month-lbl' + (showMonth?'':' blank');
+    monthLbl.textContent = showMonth ? MONTH_NAMES[firstInWeek.getMonth()].toUpperCase() : '.';
+    weekDiv.appendChild(monthLbl);
 
-    if(!cell.isFuture && cell.entry){
-      doneCt = cell.entry.done || 0;
-      totalCt = cell.entry.total || 0;
-      if(doneCt > 0){ totalDone += doneCt; activeDayCount++; }
-      const ratio = maxVal > 0 ? doneCt / maxVal : 0;
-      if(ratio === 0) level = 'l0';
-      else if(ratio <= 0.25) level = 'l1';
-      else if(ratio <= 0.5)  level = 'l2';
-      else if(ratio <= 0.75) level = 'l3';
-      else level = 'l4';
-      pctVal = totalCt > 0 ? Math.round(doneCt/totalCt*100) : 0;
-      if(pctVal > bestDayPct) bestDayPct = pctVal;
+    weekCells.forEach(cell=>{
+      const div = document.createElement('div');
+      let level='l0', doneCt=0, totalCt=0, pctVal=0;
+      if(!cell.isFuture && cell.entry){
+        doneCt  = cell.entry.done||0;
+        totalCt = cell.entry.total||0;
+        const ratio = doneCt/maxVal;
+        level = ratio===0?'l0':ratio<=0.25?'l1':ratio<=0.5?'l2':ratio<=0.75?'l3':'l4';
+        pctVal = totalCt>0 ? Math.round(doneCt/totalCt*100) : 0;
+      }
+      div.className=`hm-cell ${level}${cell.isFuture?' future':''}${cell.isToday?' today':''}`;
+
+      // Stagger entrance
+      const idx = w*7+cell.d;
+      div.style.opacity='0';
+      setTimeout(()=>{ div.style.transition='opacity 0.25s ease, transform 0.1s'; div.style.opacity='1'; }, idx*3);
+
+      if(!cell.isFuture){
+        const capDone=doneCt, capTotal=totalCt, capPct=pctVal, capCell=cell;
+
+        // Hover tooltip
+        div.addEventListener('mouseenter', e=>{
+          const tt=document.getElementById('hm-tooltip');
+          if(!tt)return;
+          const dateLbl=cell.date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+          document.getElementById('hm-tt-date').textContent=dateLbl.toUpperCase();
+          if(!capCell.entry||capDone===0){
+            document.getElementById('hm-tt-val').textContent='No activity recorded';
+            document.getElementById('hm-tt-sub').textContent=capCell.isToday?'(today — tasks not yet completed)':'';
+            document.getElementById('hm-tt-bar-fill').style.width='0%';
+          } else {
+            document.getElementById('hm-tt-val').innerHTML=isHabit
+              ? `<span style="color:var(--orange);font-size:16px;font-weight:900;">${capDone}</span> <span style="color:var(--text2)">habit${capDone!==1?'s':''} completed</span>`
+              : `<span style="color:var(--cyan);font-size:16px;font-weight:900;">${capDone}</span><span style="color:var(--text2);"> / ${capTotal} quests</span>`;
+            document.getElementById('hm-tt-sub').innerHTML=capCell.isToday
+              ? `<span style="color:var(--gold);font-weight:700;">⊙ TODAY</span> &nbsp; ${capPct}% done`
+              : `${capPct}% completion rate`;
+            document.getElementById('hm-tt-bar-fill').style.width=capPct+'%';
+          }
+          tt.style.display='block';
+          tt.style.left=(e.clientX+16)+'px';
+          tt.style.top=(e.clientY-80)+'px';
+        });
+        div.addEventListener('mousemove',e=>{
+          const tt=document.getElementById('hm-tooltip');
+          if(tt){tt.style.left=(e.clientX+16)+'px';tt.style.top=(e.clientY-80)+'px';}
+        });
+        div.addEventListener('mouseleave',()=>{
+          const tt=document.getElementById('hm-tooltip');
+          if(tt)tt.style.display='none';
+        });
+
+        // Click to open detail panel
+        div.addEventListener('click',()=>{
+          document.querySelectorAll('.hm-cell.selected').forEach(c=>c.classList.remove('selected'));
+          div.classList.add('selected');
+          const panelId = isHabit ? 'hm-habit-detail' : 'hm-detail';
+          const panel = document.getElementById(panelId);
+          if(!panel)return;
+          const dateFull=capCell.date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+          const streak = streakAt(capCell.ds);
+          const pct = capTotal>0?Math.round(capDone/capTotal*100):0;
+          if(isHabit){
+            document.getElementById('hm-hd-date').textContent = dateFull.toUpperCase();
+            document.getElementById('hm-hd-done').textContent = capDone||'—';
+            document.getElementById('hm-hd-total').textContent= capTotal||'—';
+            document.getElementById('hm-hd-pct').textContent  = capDone?pct+'%':'—';
+            document.getElementById('hm-hd-bar').style.width  = pct+'%';
+            document.getElementById('hm-hd-bar-pct').textContent = pct+'%';
+          } else {
+            document.getElementById('hm-detail-date').textContent = dateFull.toUpperCase();
+            document.getElementById('hm-dd-done').textContent   = capDone||'—';
+            document.getElementById('hm-dd-total').textContent  = capTotal||'—';
+            document.getElementById('hm-dd-pct').textContent    = capDone?pct+'%':'—';
+            document.getElementById('hm-dd-streak').textContent = streak||'—';
+            document.getElementById('hm-dd-bar').style.width    = pct+'%';
+            document.getElementById('hm-dd-bar-pct').textContent= pct+'%';
+            // Badge
+            const badge=document.getElementById('hm-detail-badge');
+            if(badge){
+              if(capCell.isToday){ badge.textContent='⊙ TODAY'; badge.style.cssText='background:rgba(255,214,10,0.15);color:var(--gold);border:1px solid rgba(255,214,10,0.4);'; }
+              else if(pct===100){ badge.textContent='🏆 PERFECT'; badge.style.cssText='background:rgba(48,209,88,0.15);color:var(--green);border:1px solid rgba(48,209,88,0.4);'; }
+              else if(pct>=75){ badge.textContent='⚡ GREAT'; badge.style.cssText='background:rgba(0,212,255,0.12);color:var(--cyan);border:1px solid rgba(0,212,255,0.3);'; }
+              else if(pct>0){ badge.textContent='• PARTIAL'; badge.style.cssText='background:rgba(191,90,242,0.12);color:var(--purple);border:1px solid rgba(191,90,242,0.3);'; }
+              else{ badge.textContent='✕ MISSED'; badge.style.cssText='background:rgba(255,55,95,0.1);color:var(--red);border:1px solid rgba(255,55,95,0.3);'; }
+            }
+          }
+          panel.classList.add('open');
+          panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+        });
+      }
+
+      weekDiv.appendChild(div);
+    });
+    container.appendChild(weekDiv);
+  }
+}
+
+// ===== HEATMAP MODAL =====
+function openHeatmapModal(){
+  const overlay=document.getElementById('hm-modal-overlay');
+  if(!overlay)return;
+  overlay.classList.add('open');
+  document.body.style.overflow='hidden';
+  // Update all-time stat
+  const el=document.getElementById('hmm-alltime');
+  if(el)el.textContent=D.stats.totalDone||0;
+  renderModalHeatmap();
+}
+function closeHeatmapModal(){
+  const overlay=document.getElementById('hm-modal-overlay');
+  if(overlay)overlay.classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('hm-modal-day-detail')?.classList.remove('open');
+}
+function hmmNav(dir){ HM.modalWeekOffset=Math.max(0,HM.modalWeekOffset+dir*hmWeeksForView(HM.modalView)); renderModalHeatmap(); }
+function hmmGoToday(){ HM.modalWeekOffset=0; renderModalHeatmap(); }
+function hmmSetView(v,el){
+  HM.modalView=v; HM.modalWeekOffset=0;
+  document.querySelectorAll('#hm-modal .hm-view-tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  renderModalHeatmap();
+}
+
+function renderModalHeatmap(){
+  const WEEKS = hmWeeksForView(HM.modalView);
+  const offset = HM.modalWeekOffset;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().split('T')[0];
+  const actMap = D.stats.activityMap||{};
+  const MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Anchor end = Saturday of current week minus offset
+  const todayDow = today.getDay();
+  const anchorEnd = new Date(today);
+  anchorEnd.setDate(today.getDate() - todayDow + 6 - offset*WEEKS*7);
+  const anchorStart = new Date(anchorEnd);
+  anchorStart.setDate(anchorEnd.getDate() - WEEKS*7 + 1);
+
+  // Range label
+  const startLbl=`${MONTH_NAMES[anchorStart.getMonth()]} ${anchorStart.getDate()}, ${anchorStart.getFullYear()}`;
+  const endLbl=`${MONTH_NAMES[anchorEnd.getMonth()]} ${anchorEnd.getDate()}, ${anchorEnd.getFullYear()}`;
+  const rangeEl=document.getElementById('hmm-range');
+  if(rangeEl)rangeEl.textContent=`${startLbl} — ${endLbl}`;
+
+  // Build cells
+  const cells=[];
+  for(let w=0;w<WEEKS;w++){
+    for(let d=0;d<7;d++){
+      const date=new Date(anchorStart);
+      date.setDate(anchorStart.getDate()+w*7+d);
+      const ds=date.toISOString().split('T')[0];
+      cells.push({date,ds,w,d,entry:actMap[ds]||null,isFuture:date>today,isToday:ds===todayStr});
     }
+  }
 
-    const isOnStreak = !cell.isFuture && activeDays.has(cell.ds) && isStreakCell(cell.ds);
-    div.className = `hm-cell ${level}${cell.isFuture?' future':''}${cell.isToday?' today':''}${isOnStreak&&level==='l4'?' streak-fire':''}`;
-
-    // Staggered fade-in animation
-    div.style.animation = div.style.animation || '';
-    div.style.opacity = '0';
-    div.style.animationFillMode = 'forwards';
-    setTimeout(() => { div.style.opacity=''; div.style.transition='opacity 0.3s ease, transform 0.12s'; }, 10 + idx * 4);
-
-    // Rich tooltip
-    const dateLabel = cell.date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-    div.addEventListener('mouseenter', e => {
-      showHeatmapTooltip(e, dateLabel, cell, doneCt, totalCt, pctVal, mode);
-    });
-    div.addEventListener('mousemove', e => {
-      const tt = document.getElementById('hm-tooltip');
-      if(tt){ tt.style.left=(e.clientX+14)+'px'; tt.style.top=(e.clientY-60)+'px'; }
-    });
-    div.addEventListener('mouseleave', () => {
-      const tt = document.getElementById('hm-tooltip');
-      if(tt) tt.style.display = 'none';
-    });
-    container.appendChild(div);
+  // Compute stats for this view window
+  const allVals=cells.filter(c=>!c.isFuture&&c.entry).map(c=>c.entry.done||0);
+  const maxVal=Math.max(...allVals,1);
+  let totalDone=0,activeDays=0,bestPct=0;
+  const activeDaySet=new Set();
+  cells.forEach(c=>{
+    if(!c.isFuture&&c.entry&&(c.entry.done||0)>0){
+      totalDone+=c.entry.done; activeDays++;
+      activeDaySet.add(c.ds);
+      const p=c.entry.total>0?Math.round(c.entry.done/c.entry.total*100):0;
+      if(p>bestPct)bestPct=p;
+    }
   });
+  function streakAt(ds){let s=0,cur=new Date(ds);while(activeDaySet.has(cur.toISOString().split('T')[0])){s++;cur.setDate(cur.getDate()-1);}return s;}
 
-  // Update stat labels
-  if(totalLblId){
-    const el = document.getElementById(totalLblId);
-    if(el) el.textContent = totalDone;
+  // Update stat boxes
+  const s=id=>{const e=document.getElementById(id);return e;};
+  if(s('hmm-total'))  s('hmm-total').textContent  = totalDone;
+  if(s('hmm-active')) s('hmm-active').textContent = activeDays;
+  if(s('hmm-streak')) s('hmm-streak').textContent = D.stats.streak||0;
+  if(s('hmm-best'))   s('hmm-best').textContent   = bestPct?bestPct+'%':'—';
+
+  // Build grid
+  const container=document.getElementById('hmm-heatmap');
+  if(!container)return;
+  container.innerHTML='';
+
+  for(let w=0;w<WEEKS;w++){
+    const weekCells=cells.slice(w*7,w*7+7);
+    const weekDiv=document.createElement('div');
+    weekDiv.className='hm-week';
+
+    // Month label
+    const firstDate=weekCells[0].date;
+    const showMonth=(w===0)||(firstDate.getDate()<=7);
+    const lbl=document.createElement('div');
+    lbl.className='hm-month-lbl'+(showMonth?'':' blank');
+    lbl.textContent=showMonth?MONTH_NAMES[firstDate.getMonth()].toUpperCase():'.';
+    weekDiv.appendChild(lbl);
+
+    weekCells.forEach(cell=>{
+      const div=document.createElement('div');
+      let level='l0',doneCt=0,totalCt=0,pctVal=0;
+      if(!cell.isFuture&&cell.entry){
+        doneCt=cell.entry.done||0;
+        totalCt=cell.entry.total||0;
+        const r=doneCt/maxVal;
+        level=r===0?'l0':r<=0.25?'l1':r<=0.5?'l2':r<=0.75?'l3':'l4';
+        pctVal=totalCt>0?Math.round(doneCt/totalCt*100):0;
+      }
+      div.className=`hm-cell ${level}${cell.isFuture?' future':''}${cell.isToday?' today':''}`;
+      const idx=w*7+cell.d;
+      div.style.opacity='0';
+      setTimeout(()=>{div.style.transition='opacity 0.2s ease,transform 0.1s';div.style.opacity='1';},idx*2);
+
+      if(!cell.isFuture){
+        const capCell=cell,capDone=doneCt,capTotal=totalCt,capPct=pctVal;
+        // Tooltip
+        div.addEventListener('mouseenter',e=>{
+          const tt=document.getElementById('hm-tooltip');if(!tt)return;
+          const dl=capCell.date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+          document.getElementById('hm-tt-date').textContent=dl.toUpperCase();
+          if(!capCell.entry||capDone===0){
+            document.getElementById('hm-tt-val').textContent='No activity recorded';
+            document.getElementById('hm-tt-sub').textContent=capCell.isToday?'(today)':'';
+            document.getElementById('hm-tt-bar-fill').style.width='0%';
+          } else {
+            document.getElementById('hm-tt-val').innerHTML=`<span style="color:var(--cyan);font-size:16px;font-weight:900;">${capDone}</span><span style="color:var(--text2);"> / ${capTotal} quests</span>`;
+            document.getElementById('hm-tt-sub').innerHTML=`${capPct}% completion${capCell.isToday?' · <span style="color:var(--gold);">TODAY</span>':''}`;
+            document.getElementById('hm-tt-bar-fill').style.width=capPct+'%';
+          }
+          tt.style.display='block';
+          tt.style.left=(e.clientX+16)+'px';
+          tt.style.top=(e.clientY-90)+'px';
+        });
+        div.addEventListener('mousemove',e=>{
+          const tt=document.getElementById('hm-tooltip');
+          if(tt){tt.style.left=(e.clientX+16)+'px';tt.style.top=(e.clientY-90)+'px';}
+        });
+        div.addEventListener('mouseleave',()=>{
+          const tt=document.getElementById('hm-tooltip');
+          if(tt)tt.style.display='none';
+        });
+
+        // Click → open day detail with task list
+        div.addEventListener('click',()=>{
+          document.querySelectorAll('#hmm-heatmap .hm-cell.selected').forEach(c=>c.classList.remove('selected'));
+          div.classList.add('selected');
+          openModalDayDetail(capCell,capDone,capTotal,capPct,streakAt(capCell.ds));
+        });
+      }
+      weekDiv.appendChild(div);
+    });
+    container.appendChild(weekDiv);
   }
-  const activeDaysEl = document.getElementById(mode==='habits'?'hm-habit-active-days':'hm-active-days');
-  if(activeDaysEl) activeDaysEl.textContent = activeDayCount;
-  const bestEl = document.getElementById(mode==='habits'?'hm-habit-streak':'hm-best-pct');
-  if(bestEl) bestEl.textContent = mode==='habits' ? (D.stats.bestStreak||0) : (bestDayPct ? bestDayPct+'%' : '—');
 }
 
-function showHeatmapTooltip(e, dateLabel, cell, doneCt, totalCt, pctVal, mode){
-  const tt = document.getElementById('hm-tooltip');
-  if(!tt) return;
-  document.getElementById('hm-tt-date').textContent = dateLabel.toUpperCase();
-  let valHtml = '', barPct = 0;
-  if(cell.isFuture){
-    valHtml = `<span style="color:var(--text3);font-size:11px;">Future date</span>`;
-  } else if(!cell.entry || (cell.entry.done||0) === 0){
-    valHtml = `<span style="color:var(--text3);font-size:11px;">No activity${cell.isToday?' today yet':''}</span>`;
-  } else {
-    if(mode==='habits'){
-      valHtml = `<span style="color:var(--orange);font-size:14px;font-weight:900;">${doneCt}</span> <span style="color:var(--text2);font-size:11px;">habit${doneCt!==1?'s':''} completed</span>`;
-      barPct = Math.min(100, Math.round(doneCt / Math.max(1, totalCt) * 100));
+function openModalDayDetail(cell,doneCt,totalCt,pctVal,streak){
+  const panel=document.getElementById('hm-modal-day-detail');
+  if(!panel)return;
+  const dateFull=cell.date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  document.getElementById('hmm-dd-date').textContent=dateFull.toUpperCase();
+  document.getElementById('hmm-dd-done').textContent=doneCt||'0';
+  document.getElementById('hmm-dd-total').textContent=totalCt||'0';
+  document.getElementById('hmm-dd-pct').textContent=doneCt?pctVal+'%':'—';
+  document.getElementById('hmm-dd-streak').textContent=streak||'—';
+  document.getElementById('hmm-dd-bar').style.width=pctVal+'%';
+  document.getElementById('hmm-dd-bar-pct').textContent=pctVal+'%';
+
+  // Badge
+  const badge=document.getElementById('hmm-dd-badge');
+  if(badge){
+    const styles={
+      perfect:'background:rgba(48,209,88,0.15);color:var(--green);border:1px solid rgba(48,209,88,0.4)',
+      great:  'background:rgba(0,212,255,0.12);color:var(--cyan);border:1px solid rgba(0,212,255,0.3)',
+      partial:'background:rgba(191,90,242,0.12);color:var(--purple);border:1px solid rgba(191,90,242,0.3)',
+      missed: 'background:rgba(255,55,95,0.1);color:var(--red);border:1px solid rgba(255,55,95,0.3)',
+      today:  'background:rgba(255,214,10,0.15);color:var(--gold);border:1px solid rgba(255,214,10,0.4)',
+    };
+    if(cell.isToday){badge.textContent='⊙ TODAY';badge.style.cssText=styles.today;}
+    else if(pctVal===100){badge.textContent='🏆 PERFECT DAY';badge.style.cssText=styles.perfect;}
+    else if(pctVal>=75) {badge.textContent='⚡ GREAT';badge.style.cssText=styles.great;}
+    else if(pctVal>0)   {badge.textContent='◑ PARTIAL';badge.style.cssText=styles.partial;}
+    else                {badge.textContent='✕ NO ACTIVITY';badge.style.cssText=styles.missed;}
+  }
+
+  // Task list
+  const taskListEl=document.getElementById('hmm-dd-tasks');
+  if(taskListEl){
+    const RANK_COLORS={S:'rgba(255,214,10,0.15)',A:'rgba(191,90,242,0.15)',B:'rgba(0,212,255,0.12)',C:'rgba(255,255,255,0.06)'};
+    const RANK_TEXT={S:'var(--gold)',A:'var(--purple)',B:'var(--cyan)',C:'var(--text3)'};
+    const tasks=cell.entry?.tasks||[];
+    if(tasks.length===0){
+      taskListEl.innerHTML=`<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">${cell.isFuture?'Future date':'No task data recorded for this day'}</div>`;
     } else {
-      valHtml = `<span style="color:var(--cyan);font-size:14px;font-weight:900;">${doneCt}</span><span style="color:var(--text2);font-size:11px;"> / ${totalCt} quests</span> <span style="color:var(--gold);font-size:11px;font-weight:700;">${pctVal}%</span>`;
-      barPct = pctVal;
+      taskListEl.innerHTML=tasks.map(t=>{
+        const rankColor=RANK_COLORS[t.rank]||RANK_COLORS.C;
+        const rankText=RANK_TEXT[t.rank]||RANK_TEXT.C;
+        const timeStr=t.time?`<span class="hm-task-time">${to12h(t.time)}</span>`:'';
+        return`<div class="hm-task-row ${t.done?'done':''}">
+          <div class="hm-task-check ${t.done?'done':'undone'}">${t.done?'✓':''}</div>
+          <div class="hm-task-title ${t.done?'done':''}">${t.title}</div>
+          ${timeStr}
+          <div class="hm-task-rank" style="background:${rankColor};color:${rankText};">${t.rank}</div>
+        </div>`;
+      }).join('');
     }
-    if(cell.isToday) valHtml += ` <span style="background:rgba(255,214,10,0.2);color:var(--gold);font-size:9px;padding:1px 5px;border-radius:4px;font-family:'Orbitron',monospace;letter-spacing:1px;">TODAY</span>`;
   }
-  document.getElementById('hm-tt-val').innerHTML = valHtml;
-  const barFill = document.getElementById('hm-tt-bar-fill');
-  if(barFill) barFill.style.width = barPct + '%';
-  tt.style.display = 'block';
-  tt.style.left = (e.clientX + 14) + 'px';
-  tt.style.top  = (e.clientY - 60) + 'px';
+
+  panel.classList.add('open');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 }
+
+// Close modal on Escape
+document.addEventListener('keydown',e=>{ if(e.key==='Escape')closeHeatmapModal(); });
 
 // ===== PROGRESS =====
 function renderProgress(){
@@ -2841,7 +3291,7 @@ function renderProgress(){
     return`<div style="flex:1;text-align:center;font-size:9px;color:${isToday?'var(--cyan)':'var(--text3)'};font-weight:${isToday?'700':'400'}">${days[d.getDay()]}</div>`;
   }).join('');
   // Render futuristic heatmap
-  buildHeatmap('p-heatmap','hm-month-labels','hm-day-labels','hm-total-lbl','tasks');
+  renderHeatmap('p-heatmap','tasks');
   document.getElementById('an-total').textContent=D.stats.totalDone;
   document.getElementById('an-streak').textContent=D.stats.bestStreak;
   document.getElementById('an-pomo').textContent=D.stats.pomodoros;
@@ -3425,7 +3875,7 @@ function renderHabits(){
   }
 
   // Render futuristic heatmap
-  buildHeatmap('habit-heatmap','hm-habit-month-labels','hm-habit-day-labels','hm-habit-total-lbl','habits');
+  renderHeatmap('habit-heatmap','habits');
 }
 function logHabit(id){
   const h=D.habits.find(h=>h.id===id);if(!h)return;
@@ -4486,6 +4936,100 @@ document.addEventListener('keydown',e=>{
 
 console.log('%c⚡ HabitSolo v5 ONLINE (Firebase Edition)','color:#00d4ff;font-size:18px;font-weight:bold;font-family:monospace');
 </script>
-<div id="hm-tooltip" class="hm-tooltip"><div class="hm-tooltip-date" id="hm-tt-date"></div><div class="hm-tooltip-val" id="hm-tt-val"></div><div class="hm-tooltip-bar"><div class="hm-tooltip-bar-fill" id="hm-tt-bar-fill" style="width:0%"></div></div></div>
+<!-- ===== HEATMAP MODAL ===== -->
+<div id="hm-modal-overlay" onclick="if(event.target===this)closeHeatmapModal()">
+  <div id="hm-modal">
+    <div class="hm-modal-header">
+      <div>
+        <div class="hm-modal-title">⚡ ACTIVITY MATRIX</div>
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1.5px;margin-top:3px;">QUEST COMPLETION LOG — CLICK ANY DAY FOR DETAILS</div>
+      </div>
+      <button class="hm-modal-close" onclick="closeHeatmapModal()">✕</button>
+    </div>
+    <div class="hm-modal-body">
+      <!-- Stats row -->
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+        <div class="hm-stat" style="flex:1;min-width:70px;"><div class="hm-stat-val" id="hmm-total" style="color:var(--cyan)">0</div><div class="hm-stat-lbl">Tasks Done</div></div>
+        <div class="hm-stat" style="flex:1;min-width:70px;"><div class="hm-stat-val" id="hmm-active" style="color:var(--green)">0</div><div class="hm-stat-lbl">Active Days</div></div>
+        <div class="hm-stat" style="flex:1;min-width:70px;"><div class="hm-stat-val" id="hmm-streak" style="color:var(--orange)">0</div><div class="hm-stat-lbl">Streak 🔥</div></div>
+        <div class="hm-stat" style="flex:1;min-width:70px;"><div class="hm-stat-val" id="hmm-best" style="color:var(--gold)">—</div><div class="hm-stat-lbl">Best Day</div></div>
+        <div class="hm-stat" style="flex:1;min-width:70px;"><div class="hm-stat-val" id="hmm-alltime" style="color:var(--purple)">0</div><div class="hm-stat-lbl">All-Time</div></div>
+      </div>
+      <!-- Nav -->
+      <div class="hm-nav-bar" style="margin-bottom:14px;">
+        <button class="hm-nav-btn" onclick="hmmNav(-1)">◀ PREV</button>
+        <span class="hm-nav-range" id="hmm-range">—</span>
+        <button class="hm-nav-btn" onclick="hmmNav(1)">NEXT ▶</button>
+        <button class="hm-nav-btn" onclick="hmmGoToday()" style="border-color:var(--gold);color:var(--gold);">⊙ TODAY</button>
+        <div class="hm-view-tabs">
+          <div class="hm-view-tab active" id="hmmtab-12w" onclick="hmmSetView('12w',this)">12W</div>
+          <div class="hm-view-tab" id="hmmtab-6m"  onclick="hmmSetView('6m',this)">6M</div>
+          <div class="hm-view-tab" id="hmmtab-1y"  onclick="hmmSetView('1y',this)">1Y</div>
+        </div>
+      </div>
+      <!-- Grid -->
+      <div class="hm-grid-wrap">
+        <div class="hm-grid-inner">
+          <div class="hm-day-labels">
+            <div class="hm-day-lbl">S</div>
+            <div class="hm-day-lbl show">MON</div>
+            <div class="hm-day-lbl">T</div>
+            <div class="hm-day-lbl show">WED</div>
+            <div class="hm-day-lbl">T</div>
+            <div class="hm-day-lbl show">FRI</div>
+            <div class="hm-day-lbl">S</div>
+          </div>
+          <div class="hm-weeks" id="hmm-heatmap"></div>
+        </div>
+      </div>
+      <!-- Legend -->
+      <div class="hm-legend" style="margin-top:14px;">
+        <div class="hm-legend-left">⚡ INTENSITY</div>
+        <div class="hm-legend-right">
+          <span class="hm-legend-lbl">NONE</span>
+          <div class="hm-legend-cell" style="background:rgba(255,255,255,0.045);"></div>
+          <div class="hm-legend-cell" style="background:rgba(0,212,255,0.2);"></div>
+          <div class="hm-legend-cell" style="background:rgba(0,212,255,0.42);"></div>
+          <div class="hm-legend-cell" style="background:rgba(0,212,255,0.7);"></div>
+          <div class="hm-legend-cell" style="background:linear-gradient(135deg,#00d4ff,#bf5af2);box-shadow:0 0 10px rgba(0,212,255,0.6);"></div>
+          <span class="hm-legend-lbl">MAX</span>
+        </div>
+      </div>
+      <!-- Day detail panel -->
+      <div id="hm-modal-day-detail">
+        <div class="hm-modal-day-header">
+          <div class="hm-modal-day-date" id="hmm-dd-date">—</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="hm-modal-day-badge" id="hmm-dd-badge"></div>
+            <button class="hm-detail-close" onclick="document.getElementById('hm-modal-day-detail').classList.remove('open');document.querySelectorAll('#hmm-heatmap .hm-cell.selected').forEach(c=>c.classList.remove('selected'))">✕</button>
+          </div>
+        </div>
+        <!-- Stats -->
+        <div class="hm-modal-stats">
+          <div class="hm-ms"><div class="hm-ms-val" id="hmm-dd-done" style="color:var(--cyan)">—</div><div class="hm-ms-lbl">Completed</div></div>
+          <div class="hm-ms"><div class="hm-ms-val" id="hmm-dd-total" style="color:var(--text2)">—</div><div class="hm-ms-lbl">Total</div></div>
+          <div class="hm-ms"><div class="hm-ms-val" id="hmm-dd-pct" style="color:var(--gold)">—</div><div class="hm-ms-lbl">Rate</div></div>
+          <div class="hm-ms"><div class="hm-ms-val" id="hmm-dd-streak" style="color:var(--orange)">—</div><div class="hm-ms-lbl">Streak</div></div>
+        </div>
+        <!-- Completion bar -->
+        <div class="hm-modal-bar-row" style="margin-bottom:18px;">
+          <div style="font-size:10px;color:var(--text2);white-space:nowrap;min-width:100px;">Completion Rate</div>
+          <div class="hm-modal-bar"><div class="hm-modal-bar-fill" id="hmm-dd-bar" style="width:0%"></div></div>
+          <div style="font-size:12px;color:var(--cyan);font-weight:700;min-width:40px;text-align:right;" id="hmm-dd-bar-pct">0%</div>
+        </div>
+        <!-- Task list -->
+        <div style="font-size:9px;color:var(--text3);letter-spacing:2px;font-weight:700;margin-bottom:10px;font-family:'Orbitron',monospace;">TASKS ON THIS DAY</div>
+        <div class="hm-task-list" id="hmm-dd-tasks"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="hm-tooltip" class="hm-tooltip">
+  <div class="hm-tt-date" id="hm-tt-date"></div>
+  <div class="hm-tt-val" id="hm-tt-val"></div>
+  <div class="hm-tt-sub" id="hm-tt-sub"></div>
+  <div class="hm-tt-bar"><div class="hm-tt-bar-fill" id="hm-tt-bar-fill" style="width:0%"></div></div>
+</div>
 </body>
 </html>
