@@ -2560,7 +2560,17 @@ function taskHTML(t,type,showSub=false){
   let timeBadge='';
   if(t.time){
     const cls=isOverdue?'overdue':'';
-    timeBadge=`<span class="task-time-badge ${cls}">⏰ ${to12h(t.time)}${isOverdue?' ⚠':''}</span>`;
+    const until=timeUntilStr(t.time);
+    const untilSpan=until&&!t.done?`<span style="font-size:9px;opacity:0.75;margin-left:4px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:0.5px;">${until}</span>`:'';
+    // Show duration/end time if set
+    let endBlock='';
+    if(t.endTime&&!t.done){
+      const durH=t.duration?Math.floor(t.duration/60):0;
+      const durM=t.duration?t.duration%60:0;
+      const durLabel=t.duration?(durH>0?(durM>0?`${durH}h ${durM}m`:`${durH}h`):`${durM}m`):'';
+      endBlock=`<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(191,90,242,0.12);border:1px solid rgba(191,90,242,0.3);border-radius:7px;padding:3px 8px;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;color:var(--purple);letter-spacing:0.3px;">→ ${to12h(t.endTime)}${durLabel?' · '+durLabel:''}</span>`;
+    }
+    timeBadge=`<span class="task-time-badge ${cls}">⏰ ${to12h(t.time)}${isOverdue?' ⚠':''}${untilSpan}</span>${endBlock}`;
   } else if(t.deadline){
     timeBadge=`<span class="task-deadline-badge">📅 ${t.deadline}</span>`;
   }
@@ -2583,15 +2593,41 @@ function taskHTML(t,type,showSub=false){
 }
 
 function sortTasksByTimeAndDone(tasks){
-  // Sort: undone tasks first (by time), then done tasks (by time)
-  const timeVal=t=>{if(!t.time&&!t.deadline)return 9999;if(t.time){const[h,m]=t.time.split(':').map(Number);return h*60+m;}if(t.deadline){const d=new Date(t.deadline);return d.getTime()/60000;}return 9999;};
-  const undone=tasks.filter(t=>!t.done).sort((a,b)=>timeVal(a)-timeVal(b));
-  const done=tasks.filter(t=>t.done).sort((a,b)=>timeVal(a)-timeVal(b));
-  return [...undone,...done];
+  // Sort ALL tasks purely by their scheduled time (ascending)
+  // Tasks with no time go to the END. Done tasks go after undone at same time.
+  const timeVal=t=>{
+    if(t.time){const[h,m]=t.time.split(':').map(Number);return h*60+m;}
+    if(t.deadline){return 23*60+59;} // deadline tasks near end of day
+    return 9999; // no time = absolute last
+  };
+  return tasks.slice().sort((a,b)=>{
+    // Done tasks always after undone
+    if(a.done!==b.done) return a.done?1:-1;
+    return timeVal(a)-timeVal(b);
+  });
+}
+
+// Returns human-friendly "time until" or "X min ago" string for a task
+function timeUntilStr(timeStr){
+  if(!timeStr) return null;
+  const now=new Date();
+  const[h,m]=timeStr.split(':').map(Number);
+  const task=new Date();task.setHours(h,m,0,0);
+  const diff=Math.round((task-now)/60000); // minutes
+  if(diff>0){
+    if(diff<60) return `in ${diff}m`;
+    const hrs=Math.floor(diff/60),mins=diff%60;
+    return mins>0?`in ${hrs}h ${mins}m`:`in ${hrs}h`;
+  } else {
+    const ago=-diff;
+    if(ago<60) return `${ago}m ago`;
+    return `${Math.floor(ago/60)}h ago`;
+  }
 }
 
 // ===== LIVE CLOCK FOR DAILY PAGE =====
 let _clockInterval=null;
+let _taskRefreshInterval=null;
 function startDailyClock(){
   function tick(){
     const el=document.getElementById('daily-clock');
@@ -2605,6 +2641,11 @@ function startDailyClock(){
   tick();
   if(_clockInterval)clearInterval(_clockInterval);
   _clockInterval=setInterval(tick,1000);
+  // Refresh task list every 60 seconds so "in Xm" countdowns update
+  if(_taskRefreshInterval)clearInterval(_taskRefreshInterval);
+  _taskRefreshInterval=setInterval(()=>{
+    if(curPage==='daily') renderTasks('daily');
+  },60000);
 }
 
 function renderTasks(type){
@@ -2620,16 +2661,16 @@ function renderTasks(type){
     const sub=document.getElementById('daily-date-sub');
     if(sub){const now=new Date();sub.textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();}
 
-    // Priority zone - S and A rank undone tasks
-    const priority=D.tasks.daily.filter(t=>!t.done&&(t.rank==='S'||t.rank==='A'));
+    // Priority zone - S and A rank undone tasks (sorted by time)
+    const priority=tasks.filter(t=>!t.done&&(t.rank==='S'||t.rank==='A'));
     const pZone=document.getElementById('d-priority-zone');
     const pList=document.getElementById('d-priority-list');
     if(pZone&&pList){
       if(priority.length>0&&sort==='all'){
         pZone.style.display='block';
         pList.innerHTML=priority.map(t=>taskHTML(t,'daily',true)).join('');
-        // Show remaining non-priority tasks below
-        const rest=tasks.filter(t=>!priority.find(p=>p.id===t.id)||t.done);
+        // Show remaining tasks (non-priority undone + all done), time-sorted
+        const rest=tasks.filter(t=>t.done||(t.rank!=='S'&&t.rank!=='A'));
         if(c)c.innerHTML=rest.map(t=>taskHTML(t,'daily',true)).join('')||'';
       }else{
         pZone.style.display='none';
@@ -2745,6 +2786,8 @@ function delTask(type,id){D.tasks[type]=D.tasks[type].filter(t=>t.id!==id);save(
 function editTask(type,id){
   const t=D.tasks[type].find(t=>t.id===id);if(!t)return;
   document.getElementById('modal-t').textContent='EDIT '+type.toUpperCase()+' QUEST';
+  const durOptions=[0,15,30,45,60,90,120,150,180,240,300,360,480];
+  const durLabels=['No duration','15 min','30 min','45 min','1 hour','1.5 hours','2 hours','2.5 hours','3 hours','4 hours','5 hours','6 hours','8 hours'];
   document.getElementById('modal-b').innerHTML=`
     <div class="form-g"><label class="form-l">Title</label><input class="form-i" id="et-title" value="${t.title.replace(/"/g,'&quot;')}"/></div>
     <div class="form-row">
@@ -2755,7 +2798,25 @@ function editTask(type,id){
         ${['Health','Work','Learning','Personal','Finance'].map(c=>`<option ${t.cat===c?'selected':''}>${c}</option>`).join('')}
       </select></div>
     </div>
-    ${type==='daily'?`<div class="form-g"><label class="form-l">Time</label><input class="form-i" id="et-time" type="time" value="${t.time||''}"/></div>`:''}
+    ${type==='daily'?`
+    <div class="form-row">
+      <div class="form-g"><label class="form-l">Start Time</label><input class="form-i" id="et-time" type="time" value="${t.time||''}" oninput="updateEndTimeEdit()"/></div>
+      <div class="form-g"><label class="form-l">Duration</label>
+        <select class="form-i" id="et-duration" onchange="updateEndTimeEdit()">
+          ${durOptions.map((v,i)=>`<option value="${v}" ${(t.duration||0)===v?'selected':''}>${durLabels[i]}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div id="et-endtime-row" style="display:${t.endTime&&t.duration?'block':'none'};margin-top:-6px;margin-bottom:10px;">
+      <div style="background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(191,90,242,0.06));border:1px solid rgba(0,212,255,0.25);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:15px;">⏱️</span>
+          <div><div style="font-size:9px;color:var(--text3);letter-spacing:1.5px;font-weight:700;">TIME BLOCK</div>
+          <div id="et-timeblock-label" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--cyan);margin-top:2px;">${t.time&&t.duration?to12h(t.time)+' → '+(t.duration>=60?Math.floor(t.duration/60)+'h'+(t.duration%60>0?' '+t.duration%60+'m':''):t.duration+'m'):'—'}</div></div>
+        </div>
+        <div style="text-align:right;"><div style="font-size:9px;color:var(--text3);letter-spacing:1.5px;font-weight:700;">ENDS AT</div>
+        <div id="et-endtime-label" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--purple);margin-top:2px;">${t.endTime?to12h(t.endTime):'—'}</div></div>
+      </div>
+    </div>`:''}
     ${type==='weekly'?`<div class="form-g"><label class="form-l">Day</label><select class="form-i" id="et-day">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<option ${t.day===d?'selected':''}>${d}</option>`).join('')}</select></div>`:''}
     ${type!=='daily'?`<div class="form-g"><label class="form-l">Deadline</label><input class="form-i" id="et-deadline" type="date" value="${t.deadline||''}"/></div>`:''}
     <div class="form-g"><label class="form-l">Subtasks (one per line)</label><textarea class="form-i" id="et-sub" rows="2" style="resize:vertical">${(t.sub||[]).map(s=>s.t).join('\n')}</textarea></div>
@@ -2770,12 +2831,45 @@ function editTask(type,id){
   openModal();
 }
 
+function updateEndTimeEdit(){
+  const timeEl=document.getElementById('et-time');
+  const durEl=document.getElementById('et-duration');
+  const row=document.getElementById('et-endtime-row');
+  const blockLbl=document.getElementById('et-timeblock-label');
+  const endLbl=document.getElementById('et-endtime-label');
+  if(!timeEl||!durEl||!row)return;
+  const timeVal=timeEl.value;
+  const durVal=parseInt(durEl.value)||0;
+  if(!timeVal||!durVal){row.style.display='none';return;}
+  const[h,m]=timeVal.split(':').map(Number);
+  const endMins=h*60+m+durVal;
+  const eh=Math.floor(endMins/60)%24,em=endMins%60;
+  const fmt=(hour,min)=>{let ap=hour>=12?'PM':'AM';let hh=hour%12||12;return(hh<10?'0'+hh:hh)+':'+(min<10?'0'+min:min)+' '+ap;};
+  const durH=Math.floor(durVal/60),durM=durVal%60;
+  const durLabel=durH>0?(durM>0?`${durH}h ${durM}m`:`${durH}h`):`${durM}m`;
+  row.style.display='block';
+  blockLbl.textContent=`${fmt(h,m)} → ${durLabel}`;
+  endLbl.textContent=fmt(eh,em);
+}
+
 function saveEditTask(type,id){
   const t=D.tasks[type].find(t=>t.id===id);if(!t)return;
   t.title=document.getElementById('et-title').value.trim()||t.title;
   t.rank=document.getElementById('et-rank').value;
   t.cat=document.getElementById('et-cat').value;
-  if(type==='daily'&&document.getElementById('et-time'))t.time=document.getElementById('et-time').value;
+  if(type==='daily'&&document.getElementById('et-time')){
+    t.time=document.getElementById('et-time').value;
+    const durVal=parseInt(document.getElementById('et-duration')?.value)||0;
+    if(durVal&&t.time){
+      t.duration=durVal;
+      const[h,m]=t.time.split(':').map(Number);
+      const endMins=h*60+m+durVal;
+      const eh=Math.floor(endMins/60)%24,em=endMins%60;
+      t.endTime=(eh<10?'0'+eh:eh)+':'+(em<10?'0'+em:em);
+    } else {
+      t.duration=null;t.endTime=null;
+    }
+  }
   if(type==='weekly'&&document.getElementById('et-day'))t.day=document.getElementById('et-day').value;
   if(document.getElementById('et-deadline'))t.deadline=document.getElementById('et-deadline').value;
   const subRaw=(document.getElementById('et-sub').value||'').split('\n').map(s=>s.trim()).filter(s=>s);
@@ -3365,7 +3459,43 @@ function openAddTask(type){
       <div class="form-g"><label class="form-l">Rank</label><select class="form-i" id="ft-rank"><option>S</option><option>A</option><option>B</option><option selected>C</option></select></div>
       <div class="form-g"><label class="form-l">Category</label><select class="form-i" id="ft-cat"><option>Health</option><option>Work</option><option>Learning</option><option>Personal</option><option>Finance</option></select></div>
     </div>
-    ${type==='daily'?`<div class="form-g"><label class="form-l">Time</label><input class="form-i" id="ft-time" type="time"/></div>`:''}
+    ${type==='daily'?`
+    <div class="form-row">
+      <div class="form-g"><label class="form-l">Start Time</label><input class="form-i" id="ft-time" type="time" oninput="updateEndTime()"/></div>
+      <div class="form-g">
+        <label class="form-l">Duration</label>
+        <select class="form-i" id="ft-duration" onchange="updateEndTime()">
+          <option value="">No duration</option>
+          <option value="15">15 min</option>
+          <option value="30">30 min</option>
+          <option value="45">45 min</option>
+          <option value="60">1 hour</option>
+          <option value="90">1.5 hours</option>
+          <option value="120">2 hours</option>
+          <option value="150">2.5 hours</option>
+          <option value="180">3 hours</option>
+          <option value="240">4 hours</option>
+          <option value="300">5 hours</option>
+          <option value="360">6 hours</option>
+          <option value="480">8 hours</option>
+        </select>
+      </div>
+    </div>
+    <div id="ft-endtime-row" style="display:none;margin-top:-6px;margin-bottom:10px;">
+      <div style="background:linear-gradient(135deg,rgba(0,212,255,0.08),rgba(191,90,242,0.06));border:1px solid rgba(0,212,255,0.25);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:15px;">⏱️</span>
+          <div>
+            <div style="font-size:9px;color:var(--text3);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;">Time Block</div>
+            <div id="ft-timeblock-label" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--cyan);margin-top:2px;letter-spacing:0.5px;">—</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;">Ends At</div>
+          <div id="ft-endtime-label" style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--purple);margin-top:2px;">—</div>
+        </div>
+      </div>
+    </div>`:''}
     ${type==='weekly'?`<div class="form-g"><label class="form-l">Day of Week</label><select class="form-i" id="ft-day"><option>Mon</option><option>Tue</option><option>Wed</option><option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option></select></div>`:''}
     ${type!=='daily'?`<div class="form-g"><label class="form-l">Deadline</label><input class="form-i" id="ft-deadline" type="date"/></div>`:''}
     <div class="form-g"><label class="form-l">Subtasks (one per line, optional)</label><textarea class="form-i" id="ft-sub" rows="2" placeholder="Step 1&#10;Step 2" style="resize:vertical"></textarea></div>
@@ -3378,13 +3508,52 @@ function openAddTask(type){
   openModal();
 }
 
+function updateEndTime(){
+  const timeEl=document.getElementById('ft-time');
+  const durEl=document.getElementById('ft-duration');
+  const row=document.getElementById('ft-endtime-row');
+  const blockLbl=document.getElementById('ft-timeblock-label');
+  const endLbl=document.getElementById('ft-endtime-label');
+  if(!timeEl||!durEl||!row)return;
+  const timeVal=timeEl.value;
+  const durVal=parseInt(durEl.value)||0;
+  if(!timeVal||!durVal){row.style.display='none';return;}
+  // Compute end time
+  const[h,m]=timeVal.split(':').map(Number);
+  const startMins=h*60+m;
+  const endMins=startMins+durVal;
+  const eh=Math.floor(endMins/60)%24,em=endMins%60;
+  const fmt=t=>{let hh=t.hour,mm=t.min,ap=hh>=12?'PM':'AM';hh=hh%12||12;return(hh<10?'0'+hh:hh)+':'+(mm<10?'0'+mm:mm)+' '+ap;};
+  const startStr=fmt({hour:h,min:m});
+  const endStr=fmt({hour:eh,min:em});
+  const durH=Math.floor(durVal/60),durM=durVal%60;
+  const durLabel=durH>0?(durM>0?`${durH}h ${durM}m`:`${durH}h`):`${durM}m`;
+  row.style.display='block';
+  blockLbl.textContent=`${startStr} → ${durLabel}`;
+  endLbl.textContent=endStr;
+}
+
 function submitTask(type){
   const title=document.getElementById('ft-title').value.trim();if(!title)return;
   const sub=(document.getElementById('ft-sub').value||'').split('\n').map(s=>s.trim()).filter(s=>s).map(t=>({t,d:false}));
   const alarmTime=document.getElementById('ft-alarm')?.value||null;
   const notes=(document.getElementById('ft-notes')?.value||'').trim();
   const t={id:Date.now(),title,rank:document.getElementById('ft-rank').value,cat:document.getElementById('ft-cat').value,done:false,sub,notes:notes||null,alarm:alarmTime||null};
-  if(type==='daily'&&document.getElementById('ft-time'))t.time=document.getElementById('ft-time').value;
+  if(type==='daily'&&document.getElementById('ft-time')){
+    t.time=document.getElementById('ft-time').value;
+    // Save duration if set
+    const durVal=parseInt(document.getElementById('ft-duration')?.value)||0;
+    if(durVal){
+      t.duration=durVal;
+      // Compute and save end time
+      if(t.time){
+        const[h,m]=t.time.split(':').map(Number);
+        const endMins=h*60+m+durVal;
+        const eh=Math.floor(endMins/60)%24,em=endMins%60;
+        t.endTime=(eh<10?'0'+eh:eh)+':'+(em<10?'0'+em:em);
+      }
+    }
+  }
   if(type==='weekly'&&document.getElementById('ft-day'))t.day=document.getElementById('ft-day').value;
   if(document.getElementById('ft-deadline'))t.deadline=document.getElementById('ft-deadline').value;
   if(alarmTime)schedRem(alarmTime,'Task: '+title);
