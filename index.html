@@ -2802,9 +2802,14 @@ function editTask(type,id){
     <div class="form-row">
       <div class="form-g"><label class="form-l">Start Time</label><input class="form-i" id="et-time" type="time" value="${t.time||''}" oninput="updateEndTimeEdit()"/></div>
       <div class="form-g"><label class="form-l">Duration</label>
-        <select class="form-i" id="et-duration" onchange="updateEndTimeEdit()">
+        <select class="form-i" id="et-duration" onchange="updateEndTimeEdit();document.getElementById('et-custom-dur-row').style.display=this.value==='custom'?'block':'none';">
           ${durOptions.map((v,i)=>`<option value="${v}" ${(t.duration||0)===v?'selected':''}>${durLabels[i]}</option>`).join('')}
+          <option value="custom" ${t.duration&&!durOptions.includes(t.duration||0)?'selected':''}>✏️ Custom...</option>
         </select>
+        <div id="et-custom-dur-row" style="display:${t.duration&&!durOptions.includes(t.duration||0)?'block':'none'};margin-top:6px;">
+          <input class="form-i" id="et-custom-dur" type="number" min="1" max="1440" placeholder="Enter minutes (e.g. 58)" value="${t.duration&&!durOptions.includes(t.duration||0)?t.duration:''}" oninput="updateEndTimeEdit()" style="font-size:13px;"/>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:0.5px;">Enter total minutes</div>
+        </div>
       </div>
     </div>
     <div id="et-endtime-row" style="display:${t.endTime&&t.duration?'block':'none'};margin-top:-6px;margin-bottom:10px;">
@@ -2839,7 +2844,8 @@ function updateEndTimeEdit(){
   const endLbl=document.getElementById('et-endtime-label');
   if(!timeEl||!durEl||!row)return;
   const timeVal=timeEl.value;
-  const durVal=parseInt(durEl.value)||0;
+  const isCustom=durEl.value==='custom';
+  const durVal=isCustom?(parseInt(document.getElementById('et-custom-dur')?.value)||0):(parseInt(durEl.value)||0);
   if(!timeVal||!durVal){row.style.display='none';return;}
   const[h,m]=timeVal.split(':').map(Number);
   const endMins=h*60+m+durVal;
@@ -2859,7 +2865,9 @@ function saveEditTask(type,id){
   t.cat=document.getElementById('et-cat').value;
   if(type==='daily'&&document.getElementById('et-time')){
     t.time=document.getElementById('et-time').value;
-    const durVal=parseInt(document.getElementById('et-duration')?.value)||0;
+    const durSel=document.getElementById('et-duration');
+    const isCustomDur=durSel?.value==='custom';
+    const durVal=isCustomDur?(parseInt(document.getElementById('et-custom-dur')?.value)||0):(parseInt(durSel?.value)||0);
     if(durVal&&t.time){
       t.duration=durVal;
       const[h,m]=t.time.split(':').map(Number);
@@ -3464,7 +3472,7 @@ function openAddTask(type){
       <div class="form-g"><label class="form-l">Start Time</label><input class="form-i" id="ft-time" type="time" oninput="updateEndTime()"/></div>
       <div class="form-g">
         <label class="form-l">Duration</label>
-        <select class="form-i" id="ft-duration" onchange="updateEndTime()">
+        <select class="form-i" id="ft-duration" onchange="updateEndTime();document.getElementById('ft-custom-dur-row').style.display=this.value==='custom'?'block':'none';">
           <option value="">No duration</option>
           <option value="15">15 min</option>
           <option value="30">30 min</option>
@@ -3478,7 +3486,12 @@ function openAddTask(type){
           <option value="300">5 hours</option>
           <option value="360">6 hours</option>
           <option value="480">8 hours</option>
+          <option value="custom">✏️ Custom...</option>
         </select>
+        <div id="ft-custom-dur-row" style="display:none;margin-top:6px;">
+          <input class="form-i" id="ft-custom-dur" type="number" min="1" max="1440" placeholder="Enter minutes (e.g. 58)" oninput="updateEndTime()" style="font-size:13px;"/>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:0.5px;">Enter total minutes</div>
+        </div>
       </div>
     </div>
     <div id="ft-endtime-row" style="display:none;margin-top:-6px;margin-bottom:10px;">
@@ -3516,21 +3529,18 @@ function updateEndTime(){
   const endLbl=document.getElementById('ft-endtime-label');
   if(!timeEl||!durEl||!row)return;
   const timeVal=timeEl.value;
-  const durVal=parseInt(durEl.value)||0;
+  const isCustom=durEl.value==='custom';
+  const durVal=isCustom?(parseInt(document.getElementById('ft-custom-dur')?.value)||0):(parseInt(durEl.value)||0);
   if(!timeVal||!durVal){row.style.display='none';return;}
-  // Compute end time
   const[h,m]=timeVal.split(':').map(Number);
-  const startMins=h*60+m;
-  const endMins=startMins+durVal;
+  const endMins=h*60+m+durVal;
   const eh=Math.floor(endMins/60)%24,em=endMins%60;
-  const fmt=t=>{let hh=t.hour,mm=t.min,ap=hh>=12?'PM':'AM';hh=hh%12||12;return(hh<10?'0'+hh:hh)+':'+(mm<10?'0'+mm:mm)+' '+ap;};
-  const startStr=fmt({hour:h,min:m});
-  const endStr=fmt({hour:eh,min:em});
+  const fmt=(hh,mm)=>{let ap=hh>=12?'PM':'AM';hh=hh%12||12;return(hh<10?'0'+hh:hh)+':'+(mm<10?'0'+mm:mm)+' '+ap;};
   const durH=Math.floor(durVal/60),durM=durVal%60;
   const durLabel=durH>0?(durM>0?`${durH}h ${durM}m`:`${durH}h`):`${durM}m`;
   row.style.display='block';
-  blockLbl.textContent=`${startStr} → ${durLabel}`;
-  endLbl.textContent=endStr;
+  blockLbl.textContent=`${fmt(h,m)} → ${durLabel}`;
+  endLbl.textContent=fmt(eh,em);
 }
 
 function submitTask(type){
@@ -3542,7 +3552,9 @@ function submitTask(type){
   if(type==='daily'&&document.getElementById('ft-time')){
     t.time=document.getElementById('ft-time').value;
     // Save duration if set
-    const durVal=parseInt(document.getElementById('ft-duration')?.value)||0;
+    const durSel=document.getElementById('ft-duration');
+    const isCustomDur=durSel?.value==='custom';
+    const durVal=isCustomDur?(parseInt(document.getElementById('ft-custom-dur')?.value)||0):(parseInt(durSel?.value)||0);
     if(durVal){
       t.duration=durVal;
       // Compute and save end time
