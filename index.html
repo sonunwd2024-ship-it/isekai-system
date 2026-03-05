@@ -301,14 +301,67 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 .crate-track{height:8px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:hidden;}
 .crate-fill{height:100%;border-radius:5px;transition:width 0.8s ease;}
 
-/* ===== HEATMAP ===== */
-.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.hm-cell{aspect-ratio:1;border-radius:2px;background:rgba(255,255,255,0.04);transition:all 0.2s;cursor:pointer;}
-.hm-cell:hover{transform:scale(1.3);}
-.hm-cell.l1{background:rgba(0,212,255,0.15);}
-.hm-cell.l2{background:rgba(0,212,255,0.35);}
-.hm-cell.l3{background:rgba(0,212,255,0.6);}
-.hm-cell.l4{background:var(--cyan);}
+/* ===== FUTURISTIC HEATMAP ===== */
+/* ===== FUTURISTIC HEATMAP ===== */
+.heatmap-outer{background:linear-gradient(135deg,rgba(0,212,255,0.03),rgba(191,90,242,0.02));border:1px solid rgba(0,212,255,0.12);border-radius:16px;padding:18px;position:relative;overflow:hidden;}
+.heatmap-outer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,rgba(0,212,255,0.5),rgba(191,90,242,0.3),transparent);}
+.heatmap-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.heatmap-title-block{}
+.heatmap-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.heatmap-subtitle{font-size:10px;color:var(--text3);letter-spacing:1px;}
+.heatmap-stats-row{display:flex;gap:12px;flex-wrap:wrap;}
+.hm-stat{text-align:center;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 14px;}
+.hm-stat-val{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;line-height:1;}
+.hm-stat-lbl{font-size:8px;color:var(--text3);letter-spacing:1.5px;margin-top:3px;font-weight:700;text-transform:uppercase;}
+.heatmap-wrap{position:relative;overflow-x:auto;padding-bottom:4px;}
+.heatmap-wrap::-webkit-scrollbar{height:3px;}
+.heatmap-wrap::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.2);border-radius:2px;}
+.heatmap-month-labels{display:flex;gap:0;margin-bottom:5px;padding-left:32px;}
+.heatmap-month-lbl{font-size:9px;color:rgba(0,212,255,0.6);letter-spacing:1.5px;font-weight:700;text-transform:uppercase;font-family:'Orbitron',monospace;flex-shrink:0;}
+.heatmap-day-labels{display:flex;flex-direction:column;gap:4px;position:absolute;left:0;top:0;}
+.heatmap-day-lbl{font-size:8px;color:var(--text3);letter-spacing:0.5px;font-weight:600;height:16px;display:flex;align-items:center;width:28px;}
+.heatmap-grid-wrap{padding-left:32px;}
+.heatmap{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,16px);gap:4px;}
+/* Cells */
+.hm-cell{width:16px;height:16px;border-radius:4px;transition:all 0.12s cubic-bezier(.4,0,.2,1);cursor:pointer;position:relative;}
+.hm-cell:hover{transform:scale(1.5);z-index:10;}
+.hm-cell.l0{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);}
+.hm-cell.l0:hover{border-color:rgba(0,212,255,0.4);}
+.hm-cell.l1{background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.25);box-shadow:0 0 5px rgba(0,212,255,0.08);}
+.hm-cell.l1:hover{box-shadow:0 0 10px rgba(0,212,255,0.4);}
+.hm-cell.l2{background:rgba(0,212,255,0.35);border:1px solid rgba(0,212,255,0.5);box-shadow:0 0 7px rgba(0,212,255,0.2);}
+.hm-cell.l2:hover{box-shadow:0 0 14px rgba(0,212,255,0.5);}
+.hm-cell.l3{background:rgba(0,212,255,0.6);border:1px solid rgba(0,212,255,0.8);box-shadow:0 0 9px rgba(0,212,255,0.35);}
+.hm-cell.l3:hover{box-shadow:0 0 18px rgba(0,212,255,0.6);}
+.hm-cell.l4{background:linear-gradient(135deg,#00d4ff,#bf5af2);border:1px solid rgba(0,212,255,0.9);box-shadow:0 0 12px rgba(0,212,255,0.6),0 0 24px rgba(0,212,255,0.25);animation:hm-glow-pulse 2.5s ease infinite;}
+.hm-cell.l4:hover{box-shadow:0 0 20px rgba(0,212,255,0.9),0 0 40px rgba(191,90,242,0.5);}
+/* Habit heatmap uses orange-red gradient */
+.hm-habit .hm-cell.l1{background:rgba(255,159,10,0.18);border-color:rgba(255,159,10,0.3);}
+.hm-habit .hm-cell.l2{background:rgba(255,159,10,0.4);border-color:rgba(255,159,10,0.6);}
+.hm-habit .hm-cell.l3{background:rgba(255,55,95,0.55);border-color:rgba(255,55,95,0.8);}
+.hm-habit .hm-cell.l4{background:linear-gradient(135deg,#ff9f0a,#ff375f);border-color:rgba(255,55,95,0.9);box-shadow:0 0 12px rgba(255,159,10,0.6),0 0 24px rgba(255,55,95,0.3);animation:hm-fire-pulse 2.5s ease infinite;}
+.hm-cell.today{outline:2px solid var(--gold);outline-offset:1px;box-shadow:0 0 12px rgba(255,214,10,0.6)!important;}
+.hm-cell.future{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.03);cursor:default;opacity:0.4;}
+.hm-cell.streak-fire::after{content:'';position:absolute;top:-3px;right:-3px;width:6px;height:6px;border-radius:50%;background:var(--orange);box-shadow:0 0 4px var(--orange);animation:hm-glow-pulse 1.5s ease infinite;}
+/* Week separator line */
+.hm-week-sep{width:1px;background:rgba(0,212,255,0.08);margin:0 1px;grid-row:span 7;}
+/* Legend */
+.hm-legend{display:flex;align-items:center;gap:7px;margin-top:12px;justify-content:space-between;flex-wrap:wrap;}
+.hm-legend-left{font-size:9px;color:var(--text3);letter-spacing:1px;display:flex;align-items:center;gap:4px;}
+.hm-legend-right{display:flex;align-items:center;gap:5px;}
+.hm-legend-lbl{font-size:9px;color:var(--text3);letter-spacing:1px;}
+.hm-legend-cell{width:13px;height:13px;border-radius:3px;border:1px solid rgba(255,255,255,0.08);}
+/* Tooltip */
+.hm-tooltip{position:fixed;background:rgba(2,4,14,0.97);border:1px solid rgba(0,212,255,0.35);border-radius:12px;padding:10px 14px;font-size:11px;color:var(--text);pointer-events:none;z-index:9999;display:none;backdrop-filter:blur(16px);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 20px rgba(0,212,255,0.1);min-width:160px;}
+.hm-tooltip::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--cyan),transparent);}
+.hm-tooltip-date{font-family:'Orbitron',monospace;font-size:9px;color:var(--cyan);letter-spacing:1.5px;margin-bottom:6px;text-transform:uppercase;}
+.hm-tooltip-val{font-weight:700;color:var(--text);font-size:12px;}
+.hm-tooltip-bar{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:6px;overflow:hidden;}
+.hm-tooltip-bar-fill{height:100%;border-radius:2px;background:linear-gradient(to right,var(--cyan),var(--purple));transition:width 0.3s;}
+/* Scanline */
+.heatmap-scanline{position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 19px,rgba(0,212,255,0.015) 19px,rgba(0,212,255,0.015) 20px);pointer-events:none;border-radius:12px;}
+@keyframes hm-glow-pulse{0%,100%{box-shadow:0 0 8px rgba(0,212,255,0.5),0 0 16px rgba(0,212,255,0.2);}50%{box-shadow:0 0 18px rgba(0,212,255,0.9),0 0 36px rgba(191,90,242,0.4);}}
+@keyframes hm-fire-pulse{0%,100%{box-shadow:0 0 8px rgba(255,159,10,0.6),0 0 16px rgba(255,55,95,0.2);}50%{box-shadow:0 0 18px rgba(255,159,10,0.9),0 0 36px rgba(255,55,95,0.5);}}
 
 /* ===== HABITS ===== */
 .habit-item{display:flex;align-items:center;gap:12px;padding:12px 13px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;margin-bottom:7px;transition:all 0.2s;}
@@ -1096,9 +1149,40 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
                 <div style="text-align:center;padding:8px;background:rgba(191,90,242,0.05);border-radius:8px"><div style="font-size:20px;margin-bottom:3px">⏱️</div><div id="an-pomo" style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--purple)">0</div><div style="font-size:9px;color:var(--text2)">POMODOROS</div></div>
               </div>
             </div>
-            <div class="card">
-              <div class="card-title">🔥 Activity Heatmap (28 days)</div>
-              <div class="heatmap" id="p-heatmap"></div>
+            <div class="heatmap-outer" style="overflow:visible;">
+              <div class="heatmap-scanline"></div>
+              <div class="heatmap-header">
+                <div class="heatmap-title-block">
+                  <div class="heatmap-title">⚡ ACTIVITY MATRIX</div>
+                  <div class="heatmap-subtitle">12-WEEK QUEST COMPLETION LOG</div>
+                </div>
+                <div class="heatmap-stats-row">
+                  <div class="hm-stat"><div class="hm-stat-val" id="hm-total-lbl" style="color:var(--cyan)">—</div><div class="hm-stat-lbl">Tasks Done</div></div>
+                  <div class="hm-stat"><div class="hm-stat-val" id="hm-active-days" style="color:var(--green)">—</div><div class="hm-stat-lbl">Active Days</div></div>
+                  <div class="hm-stat"><div class="hm-stat-val" id="hm-best-pct" style="color:var(--gold)">—</div><div class="hm-stat-lbl">Best Day</div></div>
+                </div>
+              </div>
+              <div class="heatmap-wrap" style="position:relative;">
+                <div id="hm-month-labels" class="heatmap-month-labels"></div>
+                <div style="position:relative;">
+                  <div id="hm-day-labels" class="heatmap-day-labels"></div>
+                  <div class="heatmap-grid-wrap">
+                    <div class="heatmap" id="p-heatmap"></div>
+                  </div>
+                </div>
+                <div class="hm-legend">
+                  <div class="hm-legend-left">⚡ INTENSITY</div>
+                  <div class="hm-legend-right">
+                    <span class="hm-legend-lbl">NONE</span>
+                    <div class="hm-legend-cell" style="background:rgba(255,255,255,0.04);"></div>
+                    <div class="hm-legend-cell" style="background:rgba(0,212,255,0.15);box-shadow:0 0 4px rgba(0,212,255,0.1);"></div>
+                    <div class="hm-legend-cell" style="background:rgba(0,212,255,0.35);box-shadow:0 0 6px rgba(0,212,255,0.2);"></div>
+                    <div class="hm-legend-cell" style="background:rgba(0,212,255,0.6);box-shadow:0 0 8px rgba(0,212,255,0.35);"></div>
+                    <div class="hm-legend-cell" style="background:linear-gradient(135deg,#00d4ff,#bf5af2);box-shadow:0 0 10px rgba(0,212,255,0.6);"></div>
+                    <span class="hm-legend-lbl">MAX</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1312,9 +1396,40 @@ body{font-family:'Rajdhani',sans-serif;background:var(--bg0);color:var(--text);}
 
         <div id="habits-list"></div>
 
-        <div class="card" style="margin-top:14px">
-          <div class="card-title">📆 28-Day Activity Heatmap</div>
-          <div class="heatmap" id="habit-heatmap"></div>
+        <div class="heatmap-outer" style="margin-top:14px;overflow:visible;">
+          <div class="heatmap-scanline"></div>
+          <div class="heatmap-header">
+            <div class="heatmap-title-block">
+              <div class="heatmap-title" style="color:var(--orange);">🔥 HABIT FIRE MATRIX</div>
+              <div class="heatmap-subtitle">12-WEEK HABIT COMPLETION LOG</div>
+            </div>
+            <div class="heatmap-stats-row">
+              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-total-lbl" style="color:var(--orange)">—</div><div class="hm-stat-lbl">Habits Done</div></div>
+              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-active-days" style="color:var(--green)">—</div><div class="hm-stat-lbl">Active Days</div></div>
+              <div class="hm-stat"><div class="hm-stat-val" id="hm-habit-streak" style="color:var(--red)">—</div><div class="hm-stat-lbl">Best Streak</div></div>
+            </div>
+          </div>
+          <div class="heatmap-wrap" style="position:relative;">
+            <div id="hm-habit-month-labels" class="heatmap-month-labels"></div>
+            <div style="position:relative;">
+              <div id="hm-habit-day-labels" class="heatmap-day-labels"></div>
+              <div class="heatmap-grid-wrap">
+                <div class="heatmap hm-habit" id="habit-heatmap"></div>
+              </div>
+            </div>
+            <div class="hm-legend">
+              <div class="hm-legend-left">🔥 FIRE LEVEL</div>
+              <div class="hm-legend-right">
+                <span class="hm-legend-lbl">COLD</span>
+                <div class="hm-legend-cell" style="background:rgba(255,255,255,0.04);"></div>
+                <div class="hm-legend-cell" style="background:rgba(255,159,10,0.18);"></div>
+                <div class="hm-legend-cell" style="background:rgba(255,159,10,0.4);"></div>
+                <div class="hm-legend-cell" style="background:rgba(255,55,95,0.55);"></div>
+                <div class="hm-legend-cell" style="background:linear-gradient(135deg,#ff9f0a,#ff375f);box-shadow:0 0 8px rgba(255,159,10,0.5);"></div>
+                <span class="hm-legend-lbl">🔥 MAX</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1976,10 +2091,32 @@ function runDailyReset(){
   // Nothing to do if already ran today
   if(lastOpen === today){ checkHabitStreaks(today); return; }
 
+  // ── HISTORY: record yesterday's activity BEFORE resetting tasks ──────
+  // Use a date-keyed map for accurate per-day tracking
+  D.stats.activityMap = D.stats.activityMap || {};
+  if(lastOpen){
+    const doneCt = D.tasks.daily.filter(t=>t.done).length;
+    const totalCt = D.tasks.daily.length;
+    D.stats.activityMap[lastOpen] = { done: doneCt, total: totalCt };
+    // Also backfill any missed days with 0 (so heatmap shows gaps correctly)
+    const gap = daysBetween(lastOpen, today);
+    if(gap > 1 && gap < 365){
+      for(let d=1; d<gap; d++){
+        const missedDate = new Date(lastOpen);
+        missedDate.setDate(missedDate.getDate() + d);
+        const missedStr = missedDate.toISOString().split('T')[0];
+        if(!D.stats.activityMap[missedStr])
+          D.stats.activityMap[missedStr] = { done: 0, total: totalCt };
+      }
+    }
+    // Keep map from growing too large (keep last 365 days)
+    const keys = Object.keys(D.stats.activityMap).sort();
+    if(keys.length > 365) keys.slice(0, keys.length - 365).forEach(k => delete D.stats.activityMap[k]);
+  }
+
   // ── DAILY TASKS: reset checkmarks every new day ────────────────────────
   D.tasks.daily.forEach(t=>{ 
     t.done=false; 
-    // Also reset all subtasks
     if(t.sub && t.sub.length) t.sub.forEach(s=>{ s.d=false; });
   });
 
@@ -1999,26 +2136,17 @@ function runDailyReset(){
     showToast('🗓️ New month — monthly objectives reset!');
   }
 
-  // ── STATS STREAK: track daily task completion streak ──────────────────
+  // ── STATS STREAK ──────────────────────────────────────────────────────
   if(lastOpen){
     const gap = daysBetween(lastOpen, today);
-    if(gap >= 2){
-      // Missed a day — reset overall streak
-      D.stats.streak = 0;
-    }
+    if(gap >= 2){ D.stats.streak = 0; }
   }
 
-  // ── HISTORY: record activity for heatmap ──────────────────────────────
-  const doneCt = D.tasks.daily.filter(t=>t.done).length; // count completed tasks BEFORE reset
+  // Legacy history array — keep for backwards compat but don't rely on it
   D.stats.history = D.stats.history || [];
-  D.stats.history.push(doneCt);
-  if(D.stats.history.length > 30) D.stats.history.shift();
 
   D.stats.lastOpenDate = today;
-
-  // ── HABITS: reset done count + check streak breaks ────────────────────
   checkHabitStreaks(today);
-
   save();
 }
 
@@ -2073,7 +2201,7 @@ async function loadUserData(uid, username){
   if(!D.habits)  D.habits=[];
   if(!D.goals)   D.goals=[];
   if(!D.char)    D.char={name:D.profile.name||username,avatar:'🧙',cls:'Mage',xp:0,level:1};
-  if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
+  if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null,activityMap:{}};if(!D.stats.activityMap)D.stats.activityMap={};if(!D.stats.habitActivityMap)D.stats.habitActivityMap={};
 
   // ── STREAK SANITIZATION: fix any corrupted/fake streak values ─────────
   // Streak can never be higher than total completed tasks (need 3 tasks per day)
@@ -2109,7 +2237,7 @@ async function loadUserData(uid, username){
           if(!D.habits)  D.habits=[];
           if(!D.goals)   D.goals=[];
           if(!D.char)    D.char={name:D.profile.name||username,avatar:'🧙',cls:'Mage',xp:0,level:1};
-          if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null};
+          if(!D.stats)   D.stats={totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null,activityMap:{}};if(!D.stats.activityMap)D.stats.activityMap={};if(!D.stats.habitActivityMap)D.stats.habitActivityMap={};
           // Sanitize streak values from cloud too
           const _mps=Math.floor((D.stats.totalDone||0)/3);
           if((D.stats.streak||0)>_mps)D.stats.streak=_mps;
@@ -2134,6 +2262,19 @@ async function loadUserData(uid, username){
 }
 
 function save(){
+  // Always keep today's live entry up to date in activityMap
+  try{
+    const today=todayStr();
+    D.stats.activityMap=D.stats.activityMap||{};
+    const doneCt=D.tasks.daily.filter(t=>t.done).length;
+    const totalCt=D.tasks.daily.length;
+    D.stats.activityMap[today]={done:doneCt,total:totalCt};
+    // Keep habitActivityMap total count current
+    D.stats.habitActivityMap=D.stats.habitActivityMap||{};
+    if(D.stats.habitActivityMap[today]){
+      D.stats.habitActivityMap[today].total=D.habits.length;
+    }
+  }catch(e){}
   if(_saveDebounce)clearTimeout(_saveDebounce);
   _saveDebounce=setTimeout(()=>saveImmediate(),600);
 }
@@ -2163,7 +2304,7 @@ function freshData(username='Hero'){
     habits:[],goals:[],alarms:[],
     char:{name:username,avatar:'🧙',cls:'Mage',xp:0,level:1},
     profile:{name:username,status:'',dailyGoal:5,image:null,soundOn:true,joinedAt:new Date().toISOString()},
-    stats:{totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null}
+    stats:{totalDone:0,streak:0,bestStreak:0,pomodoros:0,history:[],lastOpenDate:null,activityMap:{},habitActivityMap:{}}
   };
 }
 
@@ -2515,6 +2656,157 @@ function updateAvatarUI(){
   else{tbAv.textContent=av;tbAv.style.fontSize='18px';}
 }
 
+// ===== FUTURISTIC HEATMAP RENDERER =====
+function buildHeatmap(containerId, monthLblId, dayLblId, totalLblId, mode='tasks'){
+  const WEEKS = 16; // show more history
+  const DAYS = 7;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr_ = today.toISOString().split('T')[0];
+
+  // Pick data source
+  const actMap = mode==='habits'
+    ? (D.stats.habitActivityMap || {})
+    : (D.stats.activityMap || {});
+
+  // Build max value for scaling
+  const allVals = Object.values(actMap).map(v => mode==='habits' ? (v.done||0) : (v.done||0));
+  const maxVal = Math.max(...allVals, 1);
+
+  // Build grid starting from Sunday WEEKS weeks ago
+  const todayDow = today.getDay();
+  const gridStart = new Date(today);
+  gridStart.setDate(today.getDate() - todayDow - (WEEKS - 1) * 7);
+
+  const cells = [];
+  for(let i = 0; i < WEEKS * DAYS; i++){
+    const d = new Date(gridStart);
+    d.setDate(gridStart.getDate() + i);
+    const ds = d.toISOString().split('T')[0];
+    const entry = actMap[ds] || null;
+    const isFuture = d > today;
+    const isToday = ds === todayStr_;
+    cells.push({ date: d, ds, entry, isFuture, isToday, weekIdx: Math.floor(i/7), dow: i%7 });
+  }
+
+  // Detect consecutive active days for streak fire dots
+  const activeDays = new Set(cells.filter(c=>c.entry&&(c.entry.done||0)>0).map(c=>c.ds));
+  function isStreakCell(ds){
+    const prev = new Date(ds); prev.setDate(prev.getDate()-1);
+    const next = new Date(ds); next.setDate(next.getDate()+1);
+    return activeDays.has(prev.toISOString().split('T')[0]) || activeDays.has(next.toISOString().split('T')[0]);
+  }
+
+  // Month labels
+  const monthEl = document.getElementById(monthLblId);
+  if(monthEl){
+    const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    let html = '', lastMonth = -1;
+    for(let w = 0; w < WEEKS; w++){
+      const cellDate = cells[w * DAYS].date;
+      const m = cellDate.getMonth();
+      if(m !== lastMonth){ html += `<span class="heatmap-month-lbl" style="width:20px;">${MONTH_NAMES[m]}</span>`; lastMonth = m; }
+      else { html += `<span style="display:inline-block;width:20px;"></span>`; }
+    }
+    monthEl.innerHTML = html;
+  }
+
+  // Day labels
+  const dayLblEl = document.getElementById(dayLblId);
+  if(dayLblEl){
+    const DAY_NAMES = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    dayLblEl.innerHTML = DAY_NAMES.map((d,i)=>
+      `<div class="heatmap-day-lbl" style="visibility:${i%2===1?'visible':'hidden'}">${d}</div>`
+    ).join('');
+  }
+
+  // Build grid
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = '';
+
+  let totalDone = 0, activeDayCount = 0, bestDayPct = 0;
+
+  cells.forEach((cell, idx) => {
+    const div = document.createElement('div');
+    let level = 'l0', doneCt = 0, totalCt = 0, pctVal = 0;
+
+    if(!cell.isFuture && cell.entry){
+      doneCt = cell.entry.done || 0;
+      totalCt = cell.entry.total || 0;
+      if(doneCt > 0){ totalDone += doneCt; activeDayCount++; }
+      const ratio = maxVal > 0 ? doneCt / maxVal : 0;
+      if(ratio === 0) level = 'l0';
+      else if(ratio <= 0.25) level = 'l1';
+      else if(ratio <= 0.5)  level = 'l2';
+      else if(ratio <= 0.75) level = 'l3';
+      else level = 'l4';
+      pctVal = totalCt > 0 ? Math.round(doneCt/totalCt*100) : 0;
+      if(pctVal > bestDayPct) bestDayPct = pctVal;
+    }
+
+    const isOnStreak = !cell.isFuture && activeDays.has(cell.ds) && isStreakCell(cell.ds);
+    div.className = `hm-cell ${level}${cell.isFuture?' future':''}${cell.isToday?' today':''}${isOnStreak&&level==='l4'?' streak-fire':''}`;
+
+    // Staggered fade-in animation
+    div.style.animation = div.style.animation || '';
+    div.style.opacity = '0';
+    div.style.animationFillMode = 'forwards';
+    setTimeout(() => { div.style.opacity=''; div.style.transition='opacity 0.3s ease, transform 0.12s'; }, 10 + idx * 4);
+
+    // Rich tooltip
+    const dateLabel = cell.date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+    div.addEventListener('mouseenter', e => {
+      showHeatmapTooltip(e, dateLabel, cell, doneCt, totalCt, pctVal, mode);
+    });
+    div.addEventListener('mousemove', e => {
+      const tt = document.getElementById('hm-tooltip');
+      if(tt){ tt.style.left=(e.clientX+14)+'px'; tt.style.top=(e.clientY-60)+'px'; }
+    });
+    div.addEventListener('mouseleave', () => {
+      const tt = document.getElementById('hm-tooltip');
+      if(tt) tt.style.display = 'none';
+    });
+    container.appendChild(div);
+  });
+
+  // Update stat labels
+  if(totalLblId){
+    const el = document.getElementById(totalLblId);
+    if(el) el.textContent = totalDone;
+  }
+  const activeDaysEl = document.getElementById(mode==='habits'?'hm-habit-active-days':'hm-active-days');
+  if(activeDaysEl) activeDaysEl.textContent = activeDayCount;
+  const bestEl = document.getElementById(mode==='habits'?'hm-habit-streak':'hm-best-pct');
+  if(bestEl) bestEl.textContent = mode==='habits' ? (D.stats.bestStreak||0) : (bestDayPct ? bestDayPct+'%' : '—');
+}
+
+function showHeatmapTooltip(e, dateLabel, cell, doneCt, totalCt, pctVal, mode){
+  const tt = document.getElementById('hm-tooltip');
+  if(!tt) return;
+  document.getElementById('hm-tt-date').textContent = dateLabel.toUpperCase();
+  let valHtml = '', barPct = 0;
+  if(cell.isFuture){
+    valHtml = `<span style="color:var(--text3);font-size:11px;">Future date</span>`;
+  } else if(!cell.entry || (cell.entry.done||0) === 0){
+    valHtml = `<span style="color:var(--text3);font-size:11px;">No activity${cell.isToday?' today yet':''}</span>`;
+  } else {
+    if(mode==='habits'){
+      valHtml = `<span style="color:var(--orange);font-size:14px;font-weight:900;">${doneCt}</span> <span style="color:var(--text2);font-size:11px;">habit${doneCt!==1?'s':''} completed</span>`;
+      barPct = Math.min(100, Math.round(doneCt / Math.max(1, totalCt) * 100));
+    } else {
+      valHtml = `<span style="color:var(--cyan);font-size:14px;font-weight:900;">${doneCt}</span><span style="color:var(--text2);font-size:11px;"> / ${totalCt} quests</span> <span style="color:var(--gold);font-size:11px;font-weight:700;">${pctVal}%</span>`;
+      barPct = pctVal;
+    }
+    if(cell.isToday) valHtml += ` <span style="background:rgba(255,214,10,0.2);color:var(--gold);font-size:9px;padding:1px 5px;border-radius:4px;font-family:'Orbitron',monospace;letter-spacing:1px;">TODAY</span>`;
+  }
+  document.getElementById('hm-tt-val').innerHTML = valHtml;
+  const barFill = document.getElementById('hm-tt-bar-fill');
+  if(barFill) barFill.style.width = barPct + '%';
+  tt.style.display = 'block';
+  tt.style.left = (e.clientX + 14) + 'px';
+  tt.style.top  = (e.clientY - 60) + 'px';
+}
+
 // ===== PROGRESS =====
 function renderProgress(){
   function rate(arr){const d=arr.filter(t=>t.done).length,t=arr.length;return t>0?Math.round(d/t*100):0;}
@@ -2523,21 +2815,33 @@ function renderProgress(){
     [D.goals.length?Math.round(D.goals.reduce((a,g)=>a+g.progress,0)/D.goals.length):0,'cr-goals','cf-goals']];
   vals.forEach(([v,l,f])=>{document.getElementById(l).textContent=v+'%';document.getElementById(f).style.width=v+'%';});
   const vel=document.getElementById('vel-chart');
-  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const hist7=Array.from({length:7},(_,i)=>D.stats.history[D.stats.history.length-7+i]||0);
-  const data=hist7;
-  const mx=Math.max(...data)||1;
-  vel.innerHTML=data.map((v,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center"><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="width:100%;height:${(v/mx*90)+10}%;background:linear-gradient(to top,var(--cyan),var(--purple));border-radius:3px 3px 0 0;opacity:${i===6?1:0.55}"></div></div><div style="font-size:9px;color:var(--text2);margin-top:2px">${v}</div></div>`).join('');
-  document.getElementById('vel-labels').innerHTML=days.map(d=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--text3)">${d}</div>`).join('');
-  const hm=document.getElementById('p-heatmap');hm.innerHTML='';
-  const hmHist=D.stats.history||[];
-  const hmMax=Math.max(...hmHist,1);
-  for(let i=0;i<28;i++){
-    const v=hmHist[hmHist.length-28+i]||0;
-    const pct=v/hmMax;
-    const l=pct===0?'':pct<0.25?'l1':pct<0.5?'l2':pct<0.75?'l3':'l4';
-    hm.innerHTML+=`<div class="hm-cell ${l}" title="Day ${i+1}: ${v} done"></div>`;
-  }
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  // Build 7-day velocity from activityMap
+  const actMap=D.stats.activityMap||{};
+  const hist7=Array.from({length:7},(_,i)=>{
+    const d=new Date();d.setDate(d.getDate()-6+i);
+    const ds=d.toISOString().split('T')[0];
+    return actMap[ds]?.done||0;
+  });
+  const mx=Math.max(...hist7)||1;
+  const today=new Date().getDay();
+  vel.innerHTML=hist7.map((v,i)=>{
+    const dIdx=(new Date(new Date().setDate(new Date().getDate()-6+i))).getDay();
+    const isToday=i===6;
+    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div style="flex:1;width:100%;display:flex;align-items:flex-end">
+        <div style="width:100%;height:${Math.max(6,(v/mx*90))}%;background:linear-gradient(to top,${isToday?'var(--cyan),var(--purple)':'rgba(0,212,255,0.4),rgba(191,90,242,0.4)'});border-radius:3px 3px 0 0;box-shadow:${isToday?'0 0 8px rgba(0,212,255,0.4)':'none'};transition:height 0.6s ease;"></div>
+      </div>
+      <div style="font-size:9px;color:var(--text2);font-weight:700;">${v}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('vel-labels').innerHTML=hist7.map((_,i)=>{
+    const d=new Date();d.setDate(d.getDate()-6+i);
+    const isToday=i===6;
+    return`<div style="flex:1;text-align:center;font-size:9px;color:${isToday?'var(--cyan)':'var(--text3)'};font-weight:${isToday?'700':'400'}">${days[d.getDay()]}</div>`;
+  }).join('');
+  // Render futuristic heatmap
+  buildHeatmap('p-heatmap','hm-month-labels','hm-day-labels','hm-total-lbl','tasks');
   document.getElementById('an-total').textContent=D.stats.totalDone;
   document.getElementById('an-streak').textContent=D.stats.bestStreak;
   document.getElementById('an-pomo').textContent=D.stats.pomodoros;
@@ -3120,22 +3424,18 @@ function renderHabits(){
     }).join('')||'<div class="empty-state"><div class="ei">🔥</div><div class="et">Forge your first habit!</div></div>';
   }
 
-  const hmH=document.getElementById('habit-heatmap');hmH.innerHTML='';
-  const hmHistH=D.stats.history||[];
-  const hmMaxH=Math.max(...hmHistH,1);
-  for(let i=0;i<28;i++){
-    const v=hmHistH[hmHistH.length-28+i]||0;
-    const pct=v/hmMaxH;
-    const l=pct===0?'':pct<0.25?'l1':pct<0.5?'l2':pct<0.75?'l3':'l4';
-    hmH.innerHTML+=`<div class="hm-cell ${l}" title="${v} done"></div>`;
-  }
+  // Render futuristic heatmap
+  buildHeatmap('habit-heatmap','hm-habit-month-labels','hm-habit-day-labels','hm-habit-total-lbl','habits');
 }
 function logHabit(id){
   const h=D.habits.find(h=>h.id===id);if(!h)return;
   const today=todayStr();
-  // Don't count more than target per day
   if((h.done||0)>=h.target){showToast(`✅ ${h.name} already done today!`);return;}
   h.done=(h.done||0)+1;
+  // Record in habitActivityMap for heatmap
+  D.stats.habitActivityMap = D.stats.habitActivityMap || {};
+  const existing = D.stats.habitActivityMap[today] || { done: 0, total: D.habits.length };
+  D.stats.habitActivityMap[today] = { done: existing.done + 1, total: D.habits.length };
   if(h.done>=h.target){
     h.streak=(h.streak||0)+1;
     h.lastCompletedDate=today;
@@ -4186,5 +4486,6 @@ document.addEventListener('keydown',e=>{
 
 console.log('%c⚡ HabitSolo v5 ONLINE (Firebase Edition)','color:#00d4ff;font-size:18px;font-weight:bold;font-family:monospace');
 </script>
+<div id="hm-tooltip" class="hm-tooltip"><div class="hm-tooltip-date" id="hm-tt-date"></div><div class="hm-tooltip-val" id="hm-tt-val"></div><div class="hm-tooltip-bar"><div class="hm-tooltip-bar-fill" id="hm-tt-bar-fill" style="width:0%"></div></div></div>
 </body>
 </html>
